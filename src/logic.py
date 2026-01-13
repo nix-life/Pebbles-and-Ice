@@ -96,34 +96,36 @@ class Physics:
 
         player.on_ground = False
 
-        # Resolve vertical collisions first (landing / head bump)
+        # Find the best collision to resolve
         for rect in colliders:
             if player.rect.colliderect(rect):
-                if player.vel.y > 0:
+                # Calculate overlap on each side
+                overlap_top = player.rect.bottom - rect.top
+                overlap_bottom = rect.bottom - player.rect.top
+                overlap_left = player.rect.right - rect.left
+                overlap_right = rect.right - player.rect.left
+
+                # Find the smallest overlap (direction to push out)
+                min_overlap = min(overlap_top, overlap_bottom, overlap_left, overlap_right)
+
+                # Resolve collision based on smallest overlap
+                if min_overlap == overlap_top and player.vel.y > 0:
                     player.rect.bottom = rect.top
                     player.pos.y = player.rect.y
                     player.vel.y = 0
                     player.on_ground = True
-                    break
-                elif player.vel.y < 0:
+                elif min_overlap == overlap_bottom and player.vel.y < 0:
                     player.rect.top = rect.bottom
                     player.pos.y = player.rect.y
                     player.vel.y = 0
-                    break
-
-        # Then horizontal collisions
-        for rect in colliders:
-            if player.rect.colliderect(rect):
-                if player.vel.x > 0:
+                elif min_overlap == overlap_left and player.vel.x > 0:
                     player.rect.right = rect.left
                     player.pos.x = player.rect.x
                     player.vel.x = 0
-                    break
-                elif player.vel.x < 0:
+                elif min_overlap == overlap_right and player.vel.x < 0:
                     player.rect.left = rect.right
                     player.pos.x = player.rect.x
                     player.vel.x = 0
-                    break
 
 class LevelManager:
     def __init__(self):
