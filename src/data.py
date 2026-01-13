@@ -76,6 +76,64 @@ class SaveData(Data):
 class TutorialData(Data):
     def __init__(self):
         super().__init__()
+        pygame.init()
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((1000, 600))
+        pygame.display.set_caption("Pebbles and Ice - Tutorial")
+
+        self.load_tutorial(self.screen)
 
     def load_tutorial(self, screen):
-        print("Loading tutorial...")
+        """Display tutorial text over game background"""
+        # Load background
+        game_bg = pygame.image.load("images/game-background.png")
+        game_bg = pygame.transform.smoothscale(game_bg, (1000, 600))
+        
+        while True:
+            self.events = pygame.event.get()
+            for event in self.events:
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                    return
+            
+            # Draw background
+            self.screen.blit(game_bg, (0, 0))
+
+            overlay = pygame.Surface((1000, 600))
+            overlay.set_alpha(100)
+            overlay.fill((0, 0, 0))
+            self.screen.blit(overlay, (0, 0))
+            
+            # Display tutorial text
+            title_font = pygame.font.SysFont("verdana", 60, bold=True)
+            text_font = pygame.font.SysFont("verdana", 28)
+            
+            title = title_font.render("TUTORIAL", True, (255, 255, 255))
+            title_rect = title.get_rect(center=(500, 40))
+            self.screen.blit(title, title_rect)
+            
+            tutorial_lines = [
+                "CONTROLS:",
+                "A/D - Move left/right     W/SPACE - Jump",
+                "",
+                "STORY:",
+                "You are a penguin named Tux.",
+                "Your goal is to bring a pebble to your friend Domino.",
+                "Collect fish to score high on the leaderboard!",
+                "",
+                "Press any key or click to continue..."
+            ]
+            
+            y_offset = 120
+            for line in tutorial_lines:
+                text_surface = text_font.render(line, True, (255, 255, 255))
+                text_rect = text_surface.get_rect(center=(500, y_offset))
+                self.screen.blit(text_surface, text_rect)
+                y_offset += 50
+            
+            pygame.display.flip()
+            self.clock.tick(60)
+
+TutorialData()
