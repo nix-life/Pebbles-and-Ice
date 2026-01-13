@@ -195,6 +195,3 @@ class NPC(Sprites):
 
     def start_minigame(self):
         pass
-
-if __name__ == "__main__":
-    Environment()
