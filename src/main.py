@@ -1,14 +1,14 @@
 import pygame
-from sprites import Player
+from sprites import Player, Environment
 from logic import Physics
 
-class Main:
+class GameLevel:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Pebbles and Ice")
 
-        self.player = Player(120, 120)
+        self.player = Player(120, self.screen.get_height() - 200)
         self.physics = Physics()
         self.game_bg = pygame.image.load("images/game-background.png")
         self.game_bg = pygame.transform.smoothscale(self.game_bg, (1000, 600))
@@ -39,7 +39,7 @@ class Main:
         
         # Define platform rects to match image sizes
         normal_platforms = [
-            pygame.Rect(0, 600, 350, 100),      # big-platform at (0, 600)
+            pygame.Rect(0, self.screen.get_height(), 350, 100),      # big-platform at (0, 600)
             pygame.Rect(200, 400, 350, 100),    # big-platform at (200, 400)
             pygame.Rect(0, 650, 1000, 50)       # platform beneath the ground
         ]
@@ -69,4 +69,5 @@ class Main:
             pygame.display.flip()
 
 
-Main()
+if __name__ == "__main__":
+    Environment()
