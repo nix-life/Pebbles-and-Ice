@@ -151,49 +151,10 @@ class Environment(Sprites):
                 self.level_selection_loop()
                 return
             elif result == "new":
-                self.show_tutorial()
+                self.tut.load_tutorial(self.screen)
                 return
 
             pygame.display.flip()
-
-    def show_tutorial(self):
-        """Display tutorial text over game background"""
-        while True:
-            self.events = pygame.event.get()
-            for event in self.events:
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-                elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                    return
-            
-            self.screen.blit(self.game_bg, (0, 0))
-            
-            # Display tutorial text
-            title_font = pygame.font.SysFont("verdana", 60, bold=True)
-            text_font = pygame.font.SysFont("verdana", 32)
-            
-            title = title_font.render("TUTORIAL", True, (255, 255, 255))
-            title_rect = title.get_rect(center=(500, 80))
-            self.screen.blit(title, title_rect)
-            
-            tutorial_lines = [
-                "A/D - Move left/right",
-                "W/SPACE - Jump",
-                "Avoid obstacles and reach the end!",
-                "",
-                "write more later"
-            ]
-            
-            y_offset = 200
-            for line in tutorial_lines:
-                text_surface = text_font.render(line, True, (255, 255, 255))
-                text_rect = text_surface.get_rect(center=(500, y_offset))
-                self.screen.blit(text_surface, text_rect)
-                y_offset += 80
-            
-            pygame.display.flip()
-            self.clock.tick(60)
 
     def level_selection_loop(self):
         """temporary"""

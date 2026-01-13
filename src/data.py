@@ -76,6 +76,46 @@ class SaveData(Data):
 class TutorialData(Data):
     def __init__(self):
         super().__init__()
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((1000, 600))
 
     def load_tutorial(self, screen):
-        print("Loading tutorial...")
+        """Display tutorial text over game background"""
+        while True:
+            self.events = pygame.event.get()
+            for event in self.events:
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                    return
+            
+            # Display tutorial text
+            title_font = pygame.font.SysFont("verdana", 60, bold=True)
+            text_font = pygame.font.SysFont("verdana", 32)
+            
+            title = title_font.render("TUTORIAL", True, (255, 255, 255))
+            title_rect = title.get_rect(center=(500, 80))
+            self.screen.blit(title, title_rect)
+            
+            tutorial_lines = [
+                "A/D - Move left/right",
+                "W/SPACE - Jump",
+                "Avoid obstacles and reach the end!",
+                "",
+                "Story: "
+                "You are a peguin named Tux. Your goal is to bring a pebble to your friend named Domino. "
+                "Along the way, you will be faced with various challenges and obstacles. "
+                "To score high on the leaderboard, try to collect the most fish possible!"
+                "Good Luck and Have Fun!"
+            ]
+            
+            y_offset = 200
+            for line in tutorial_lines:
+                text_surface = text_font.render(line, True, (255, 255, 255))
+                text_rect = text_surface.get_rect(center=(500, y_offset))
+                self.screen.blit(text_surface, text_rect)
+                y_offset += 80
+            
+            pygame.display.flip()
+            self.clock.tick(60)
