@@ -76,22 +76,20 @@ class SaveData(Data):
 class TutorialData(Data):
     def __init__(self):
         super().__init__()
-        pygame.init()
-        self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode((1000, 600))
-        pygame.display.set_caption("Pebbles and Ice - Tutorial")
-
-        self.load_tutorial(self.screen)
 
     def load_tutorial(self, screen):
         """Display tutorial text over game background"""
+        pygame.init()
+        clock = pygame.time.Clock()
+        pygame.display.set_caption("Pebbles and Ice")
+        
         # Load background
         game_bg = pygame.image.load("images/game-background.png")
         game_bg = pygame.transform.smoothscale(game_bg, (1000, 600))
         
         while True:
-            self.events = pygame.event.get()
-            for event in self.events:
+            events = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return
@@ -99,12 +97,12 @@ class TutorialData(Data):
                     return
             
             # Draw background
-            self.screen.blit(game_bg, (0, 0))
+            screen.blit(game_bg, (0, 0))
 
             overlay = pygame.Surface((1000, 600))
             overlay.set_alpha(100)
             overlay.fill((0, 0, 0))
-            self.screen.blit(overlay, (0, 0))
+            screen.blit(overlay, (0, 0))
             
             # Display tutorial text
             title_font = pygame.font.SysFont("verdana", 60, bold=True)
@@ -112,7 +110,7 @@ class TutorialData(Data):
             
             title = title_font.render("TUTORIAL", True, (255, 255, 255))
             title_rect = title.get_rect(center=(500, 40))
-            self.screen.blit(title, title_rect)
+            screen.blit(title, title_rect)
             
             tutorial_lines = [
                 "CONTROLS:",
@@ -130,10 +128,8 @@ class TutorialData(Data):
             for line in tutorial_lines:
                 text_surface = text_font.render(line, True, (255, 255, 255))
                 text_rect = text_surface.get_rect(center=(500, y_offset))
-                self.screen.blit(text_surface, text_rect)
+                screen.blit(text_surface, text_rect)
                 y_offset += 50
             
             pygame.display.flip()
-            self.clock.tick(60)
-
-TutorialData()
+            clock.tick(60)
