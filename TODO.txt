@@ -1,0 +1,9 @@
+1. Level 1,2,3,4,5
+2. Minigames
+3. Implement NPCs with dialouges 
+4. Save/load files 
+5. Shrink everything
+6. Implement danger
+7. Implement when touch water, die 
+8. Implement power ups (intelligence, double jump)
+9. Fix up hitboxes

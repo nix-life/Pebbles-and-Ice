@@ -46,7 +46,7 @@ class GameController:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.boxes[1].collidepoint(event.pos):
-                    return "start_game"
+                    return "start_level1"
                 elif self.boxes[2].collidepoint(event.pos): 
                     print("Level 2 selected")
                 elif self.boxes[3].collidepoint(event.pos):
