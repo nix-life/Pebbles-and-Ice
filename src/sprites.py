@@ -93,6 +93,7 @@ class Enemy(Sprites):
 class Environment(Sprites):
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption("Pebbles and Ice")
         self.loading = data.PlayerStats()
         self.load_data = data.SaveData()
         self.game_control = logic.GameController()
@@ -115,12 +116,11 @@ class Environment(Sprites):
         self.starting()
 
     def starting(self):
+        """Main enter screen - shows loading screen with button"""
         self.current_bg = self.before
         self.button_rect = pygame.Rect(405, 462, 150, 53)
         clicked_button = False
         flash_timer = 0
-        self.current_screen = "loading" 
-        result = ""
 
         while True:
             dt = self.clock.tick(60) / 1000
@@ -141,18 +141,21 @@ class Environment(Sprites):
             if clicked_button and flash_timer > 0:
                 flash_timer -= dt
             elif clicked_button and flash_timer <= 0:
-                """temporary"""
+                """Move to returning player screen"""
                 result = self.loading.update_level(self.screen, self.events)
                 self.current_bg = self.game_bg
                 self.current_screen = "selection"
-            
-            """temporary"""
-            if result == "returning":
-                self.level_selection_loop()
-                return
-            elif result == "new":
-                self.tut.load_tutorial(self.screen)
-                return
+                
+                # Handle returning player decision
+                if result == "returning":
+                    """Yes - Open level selection"""
+                    self.level_selection_loop()
+                    return
+                elif result == "new":
+                    """No - Open tutorial first"""
+                    self.tut.load_tutorial(self.screen)
+                    self.level_selection_loop()
+                    return
 
             pygame.display.flip()
 
@@ -168,9 +171,8 @@ class Environment(Sprites):
             self.screen.blit(self.game_bg, (0, 0))
             result = self.game_control.update_game(self.screen, self.events)
             if result == "start_game":
-                pygame.quit()
-                import main
-                main.Main()
+                from main import GameLevel
+                GameLevel()
                 return
             pygame.display.flip()
 
