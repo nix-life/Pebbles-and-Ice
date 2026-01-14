@@ -12,6 +12,13 @@ class GameLevel:
         self.physics = Physics()
         self.game_bg = pygame.image.load("images/game-background.png")
         self.game_bg = pygame.transform.smoothscale(self.game_bg, (1000, 600))
+        
+        # Load water image
+        self.water_img = pygame.image.load("images/water.png")
+        self.water_img = pygame.transform.smoothscale(self.water_img, (50, 50))
+        self.water_x = 0  # Start from left
+        self.water_speed = 150  # pixels per second
+        self.water_y = self.screen.get_height() - self.water_img.get_height()  # Position at bottom
 
         self.loop()
 
@@ -54,7 +61,26 @@ class GameLevel:
             if not self.event_handling():
                 keep_going = False
 
+            # Update water position (move left)
+            self.water_x -= self.water_speed * dt
+            
+            # Reset water position when one tile cycle is complete
+            water_width = self.water_img.get_width()
+            if self.water_x <= -water_width:
+                self.water_x = 0
+
             self.screen.blit(self.game_bg, (0, 0))
+            
+            # Draw water tiles continuously to fill entire screen width
+            water_width = self.water_img.get_width()
+            screen_width = self.screen.get_width()
+            
+            # Calculate how many tiles we need to fill the screen
+            tiles_needed = (screen_width // water_width) + 2
+            
+            # Draw water tiles in a loop
+            for i in range(tiles_needed):
+                self.screen.blit(self.water_img, (int(self.water_x + water_width * i), int(self.water_y)))
             self.screen.blit(normal_platform_img, (0, 600))
             self.screen.blit(normal_platform_img, (200, 400))
             self.screen.blit(ice_platform_img, (600, 460))
