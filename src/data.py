@@ -10,9 +10,14 @@ class PlayerStats(Data):
         pygame.init()
         self.boxes = {}
         self.game_controller = logic.GameController()
+        self.double_jump_unlocked = False
 
-    def unlock_ability(self):
-        pass
+    def unlock_ability(self, level):
+        if level >= 2:
+            self.double_jump_unlocked = True
+            print("Double Jump ability unlocked!")
+        elif level > 3:
+            pass
 
     def intelligence_level(self):
         pass
