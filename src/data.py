@@ -81,6 +81,7 @@ class TutorialData(Data):
         """Display tutorial text over game background"""
         pygame.init()
         clock = pygame.time.Clock()
+        pygame.display.set_caption("Pebbles and Ice")
         
         # Load background
         game_bg = pygame.image.load("images/game-background.png")

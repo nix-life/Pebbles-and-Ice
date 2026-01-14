@@ -93,6 +93,7 @@ class Enemy(Sprites):
 class Environment(Sprites):
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption("Pebbles and Ice")
         self.loading = data.PlayerStats()
         self.load_data = data.SaveData()
         self.game_control = logic.GameController()
@@ -120,7 +121,6 @@ class Environment(Sprites):
         self.button_rect = pygame.Rect(405, 462, 150, 53)
         clicked_button = False
         flash_timer = 0
-        self.current_screen = "loading" 
 
         while True:
             dt = self.clock.tick(60) / 1000
