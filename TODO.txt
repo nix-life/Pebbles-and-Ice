@@ -6,4 +6,4 @@
 6. Implement danger
 7. Implement when touch water, die 
 8. Implement power ups (intelligence, double jump)
-9. Fix up hitboxes
+9. Fix up hitboxes 
