@@ -1,4 +1,5 @@
 import pygame
+from data import PlayerStats
 class Logic:
     def __init__(self):
         pass
@@ -8,6 +9,7 @@ class GameController:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.boxes = {} 
+        self.level = 1
 
     def update_game(self, screen, events):
     
@@ -46,14 +48,19 @@ class GameController:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.boxes[1].collidepoint(event.pos):
+                    self.level = 1
                     return "start_game"
                 elif self.boxes[2].collidepoint(event.pos): 
+                    self.level = 2
                     print("Level 2 selected")
                 elif self.boxes[3].collidepoint(event.pos):
+                    self.level = 3
                     print("Level 3 selected")
                 elif self.boxes[4].collidepoint(event.pos):
+                    self.level = 4
                     print("Level 4 selected")
                 elif self.boxes[5].collidepoint(event.pos):
+                    self.level = 5
                     print("Level 5 selected")
                     
     def start_game(self):
@@ -96,9 +103,6 @@ class Physics:
 
         player.on_ground = False
 
-        if player.rect.colliderect(colliders[2]):
-            print("Player hit water!")
-        
         # Find the best collision to resolve
         for rect in colliders:
             if player.rect.colliderect(rect):
@@ -129,6 +133,7 @@ class Physics:
                     player.rect.left = rect.right
                     player.pos.x = player.rect.x
                     player.vel.x = 0
+
 class LevelManager:
     def __init__(self):
         super().__init__()
@@ -140,7 +145,10 @@ class LevelManager:
         pass
 
     def check_level_completion(self):
-        pass
-    
-    def unlock_ability(self, level_number):
+        if self.level > 1:
+            PlayerStats.unlock_ability(self.level)
+        elif self.level > 3:
+            PlayerStats.unlock_ability(self.level)
+
+    def unlock_ability(self):
         pass
