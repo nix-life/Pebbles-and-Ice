@@ -4,6 +4,6 @@
 4. Save/load files 
 5. Shrink everything
 6. Implement danger
-7. Implement when touch water, die 
-8. Implement power ups (intelligence, double jump)
+7. Implement when touch water, die
+8. Implement power ups (intelligence, double jump) --> done double jump, just need to test
 9. Fix up hitboxes 
