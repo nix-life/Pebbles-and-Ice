@@ -46,27 +46,50 @@ class Player(Sprites):
         self.abilities = []
         self.on_ground = False
 
-    def load_tux(self, direction):
-        if direction == "up":
-            pass
-        elif direction == "down":
-            pass
-        elif direction == "left":
-            pass
-        elif direction == "right":
-            pass
+        self.base = pygame.image.load("images/basetux.png").convert_alpha()
+        self.base = pygame.transform.smoothscale(self.base, (40, 60))
+
+        self.tux_left = pygame.image.load("images/tux-left.png").convert_alpha()
+        self.tux_left = pygame.transform.smoothscale(self.tux_left, (40, 60))
+        
+        self.tux_right = pygame.image.load("images/tux-right.png").convert_alpha()
+        self.tux_right = pygame.transform.smoothscale(self.tux_right, (40, 60))
 
     def movement(self, keys):
         self.vel.x = 0
 
+        no_key_pressed = True
+
         if keys[pygame.K_a]:
             self.vel.x = -self.speed
-        if keys[pygame.K_d]:
+            self.direction = "left"
+            no_key_pressed = False
+            self.change_direction()
+
+        elif keys[pygame.K_d]:
             self.vel.x = self.speed
+            self.direction = "right"
+            no_key_pressed = False
+            self.change_direction()
 
         if (keys[pygame.K_w] or keys[pygame.K_SPACE]) and self.on_ground:
             self.vel.y = -self.jump
             self.on_ground = False
+
+        if no_key_pressed:
+            self.direction = "normal"
+            self.change_direction()
+
+    def change_direction(self):
+        if self.direction == "normal":
+            player_image = self.base
+        elif self.direction == "right":
+            player_image = self.tux_right
+        elif self.direction == "left":
+            player_image = self.tux_left
+        
+        self.image = player_image
+        self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
 
     def take_damage(self):
         pass
