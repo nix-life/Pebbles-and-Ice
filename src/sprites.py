@@ -42,7 +42,7 @@ class Player(Sprites):
         super().__init__(x=x, y=y, width=40, height=60, image=player_image)
         self.health = 3
         self.speed = 310
-        self.jump = 1000
+        self.jump = 900
         self.abilities = []
         self.on_ground = False
 

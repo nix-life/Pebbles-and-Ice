@@ -96,6 +96,9 @@ class Physics:
 
         player.on_ground = False
 
+        if player.rect.colliderect(colliders[2]):
+            print("Player hit water!")
+        
         # Find the best collision to resolve
         for rect in colliders:
             if player.rect.colliderect(rect):
@@ -126,7 +129,6 @@ class Physics:
                     player.rect.left = rect.right
                     player.pos.x = player.rect.x
                     player.vel.x = 0
-
 class LevelManager:
     def __init__(self):
         super().__init__()
