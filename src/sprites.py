@@ -38,15 +38,13 @@ class Sprites(pygame.sprite.Sprite):
 class Player(Sprites):
     def __init__(self, x=120, y=120):
         player_image = pygame.image.load("images/basetux.png").convert_alpha()
-        player_image = pygame.transform.smoothscale(player_image, (50, 75))
+        player_image = pygame.transform.smoothscale(player_image, (80, 120))
         super().__init__(x=x, y=y, width=40, height=60, image=player_image)
         self.health = 3
         self.speed = 310
-        self.jump = 850
+        self.jump = 900
         self.abilities = []
         self.on_ground = False
-        self.double_jump_available = False
-        self.double_jump_unlocked = False
 
     def load_tux(self, direction):
         if direction == "up":
@@ -66,14 +64,9 @@ class Player(Sprites):
         if keys[pygame.K_d]:
             self.vel.x = self.speed
 
-        if (keys[pygame.K_w] or keys[pygame.K_SPACE]):
-            if self.on_ground:
-                self.vel.y = -self.jump
-                self.on_ground = False
-                self.double_jump_available = True
-            elif self.double_jump_available and self.double_jump_unlocked:
-                self.vel.y = -self.jump
-                self.double_jump_available = False
+        if (keys[pygame.K_w] or keys[pygame.K_SPACE]) and self.on_ground:
+            self.vel.y = -self.jump
+            self.on_ground = False
 
     def take_damage(self):
         pass

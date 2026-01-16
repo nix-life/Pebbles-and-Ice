@@ -55,6 +55,8 @@ class GameLevel:
             pygame.Rect(600, 460, ice_platform_size[0], ice_platform_size[1])     # big-ice-platform at (600, 460)
         ]
 
+        water_hitbox = pygame.Rect(0, self.screen.get_height() - self.water_img.get_height(), self.screen.get_width(), self.water_img.get_height())
+
         while keep_going:
             dt = clock.tick(60) / 1000
 
@@ -88,7 +90,7 @@ class GameLevel:
 
             self.physics.apply_gravity(self.player, dt)
             self.player.update(dt)
-            self.physics.handle_collisions(self.player, normal_platforms + ice_platforms)
+            self.physics.handle_collisions(self.player, normal_platforms + ice_platforms + [water_hitbox])
             self.physics.apply_friction(self.player, dt)
 
             self.player.draw(self.screen)
