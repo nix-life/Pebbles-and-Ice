@@ -5,6 +5,23 @@ class Minigame:
     def __init__(self):
         pass
 
+    def check_minigame(self, minigame):
+        # TODO: Add transition later for all minigames between level + minigame
+        if minigame == "ice":
+            IcePuzzle()
+
+        if minigame == "blizzard":
+            BlizzardSurvival()
+
+        if minigame == "fish":
+            FishFrenzy()
+class IcePuzzle(Minigame):
+    def __init__(self):
+        super().__init__()
+
+class BlizzardSurvival(Minigame):
+    def __init__(self):
+        super().__init__()
 class FishFrenzy(Minigame):
     def __init__(self):
         super().__init__()
