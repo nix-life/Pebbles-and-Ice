@@ -16,8 +16,9 @@ class Minigame:
         if minigame == "fish":
             FishFrenzy()
 
-        if minigame == "dodge":
-            BlizzardSurvival()
+        if minigame == "logic":
+            LogicTrial()
+
 class IcePuzzle(Minigame):
     def __init__(self):
         super().__init__()
@@ -810,3 +811,216 @@ class FishFrenzy(Minigame):
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # Left mouse button
                         self.check_fish_click(event.pos)
+
+class LogicTrial(Minigame):
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((1000, 600))
+        pygame.display.set_caption("Logic Trial - Animal Quiz")
+    
+        self.questions = [
+            ("Which animal has the most powerful bite force?", ["Shark", "Crocodile", "Hippo"], 2),
+            ("What is the only mammal capable of true flight?", ["Flying Squirrel", "Bat", "Flying Fish"], 1),
+            ("Which animal can survive in the harshest desert conditions without water for weeks?", ["Camel", "Kangaroo Rat", "Scorpion"], 1),
+            ("What metabolic process allows some animals to survive winter without eating?", ["Migration", "Hibernation", "Adaptation"], 1),
+            ("Which marine animal has the largest brain relative to body size?", ["Dolphin", "Sperm Whale", "Octopus"], 0),
+            ("What is the term for animals that are active during twilight hours?", ["Nocturnal", "Crepuscular", "Diurnal"], 1),
+            ("Which bird has the fastest recorded dive speed exceeding 240 mph?", ["Golden Eagle", "Peregrine Falcon", "Hawk"], 1),
+            ("What symbiotic relationship exists between oxpeckers and large mammals?", ["Parasitism", "Mutualism", "Commensalism"], 1),
+            ("Which animal has the longest known lifespan, living over 200 years?", ["Elephant", "Whale", "Bowhead Whale"], 2),
+            ("What biological process allows some lizards to regrow lost limbs?", ["Mitosis", "Regeneration", "Adaptation"], 1),
+        ]
+        
+        self.current_question = 0
+        self.score = 0
+        self.game_state = "playing"  
+        self.feedback_timer = 0
+        
+        # Colors
+        self.bg_color = (30, 60, 90)
+        self.text_color = (255, 255, 255)
+        self.correct_color = (50, 200, 50)
+        self.wrong_color = (200, 50, 50)
+        self.option_color = (70, 130, 180)
+        self.option_hover = (100, 160, 210)
+        
+        # Fonts
+        self.title_font = pygame.font.SysFont("verdana", 36, bold=True)
+        self.question_font = pygame.font.SysFont("verdana", 28)
+        self.option_font = pygame.font.SysFont("verdana", 24)
+        self.small_font = pygame.font.SysFont("verdana", 20)
+
+        self.loop()
+        pygame.quit()
+
+    def draw_progress_bar(self):
+        bar_width = 600
+        bar_height = 30
+        bar_x = (1000 - bar_width) // 2
+        bar_y = 60
+        
+        pygame.draw.rect(self.screen, (50, 50, 50), (bar_x, bar_y, bar_width, bar_height), border_radius=10)
+        
+        # Progress fill
+        progress = (self.current_question / len(self.questions)) * bar_width
+        if progress > 0:
+            pygame.draw.rect(self.screen, (100, 200, 100), (bar_x, bar_y, progress, bar_height), border_radius=10)
+        
+        # Progress text
+        progress_text = self.small_font.render("Question %s" % (str(self.current_question+1) + " / " + str(len(self.questions))), True, self.text_color)
+        self.screen.blit(progress_text, (bar_x + bar_width // 2 - progress_text.get_width() // 2, bar_y + 35))
+
+    def draw_question(self):
+        if self.current_question >= len(self.questions):
+            return
+
+        question, options, correct_index = self.questions[self.current_question]
+
+        # Draw question
+        question_surface = self.question_font.render(question, True, self.text_color)
+        question_rect = question_surface.get_rect(center=(500, 150))
+        self.screen.blit(question_surface, question_rect)
+
+        i = 0
+        for option in options:
+            option_y = 250 + i * 100
+            option_rect = pygame.Rect(200, option_y, 600, 70)
+
+            # Option box
+            pygame.draw.rect(self.screen, self.option_color, option_rect, border_radius=10)
+            pygame.draw.rect(self.screen, self.text_color, option_rect, 3, border_radius=10)
+
+            option_text = self.option_font.render("%d. %s" % (i + 1, option), True, self.text_color)
+            text_rect = option_text.get_rect(center=option_rect.center)
+            self.screen.blit(option_text, text_rect)
+
+            i += 1
+
+        # Instructions
+        instruction_text = self.small_font.render(
+            "Press 1, 2, or 3 to select your answer",
+            True,
+            (200, 200, 200)
+        )
+        self.screen.blit(
+            instruction_text,
+            (500 - instruction_text.get_width() // 2, 550)
+        )
+
+
+    def draw_feedback(self):
+        if self.game_state == "correct":
+            text = self.title_font.render("Correct!", True, self.correct_color)
+        elif self.game_state == "wrong":
+            text = self.title_font.render("Wrong!", True, self.wrong_color)
+        else:
+            return
+        
+        text_rect = text.get_rect(center=(500, 300))
+        self.screen.blit(text, text_rect)
+
+    def draw_results(self):
+        # Final score screen
+        title = self.title_font.render("Quiz Complete!", True, self.text_color)
+        self.screen.blit(title, (500 - title.get_width() // 2, 150))
+        
+        score_text = self.question_font.render("Your Score: %s" % (str(self.score) + " / " + str(len(self.questions))), True, self.text_color)
+        self.screen.blit(score_text, (500 - score_text.get_width() // 2, 250))
+        
+        percentage = (self.score / len(self.questions)) * 100
+        if percentage >= 80:
+            grade = "Excellent!"
+            grade_color = self.correct_color
+        elif percentage >= 60:
+            grade = "Good Job!"
+            grade_color = (200, 200, 50)
+        else:
+            grade = "Failed - Must Restart!"
+            grade_color = self.wrong_color
+        
+        grade_text = self.title_font.render(grade, True, grade_color)
+        self.screen.blit(grade_text, (500 - grade_text.get_width() // 2, 330))
+        
+        if percentage <= 50:
+            continue_text = self.small_font.render("Press R to restart the quiz", True, (200, 200, 200))
+        else:
+            continue_text = self.small_font.render("Press SPACE to continue", True, (200, 200, 200))
+        self.screen.blit(continue_text, (500 - continue_text.get_width() // 2, 450))
+
+    def handle_answer(self, answer_index):
+        if self.game_state != "playing":
+            return
+            
+        correct = self.questions[self.current_question]
+        
+        if answer_index == correct:
+            self.score += 1
+            self.game_state = "correct"
+        else:
+            self.game_state = "wrong"
+        
+        self.feedback_timer = 60  
+
+    def loop(self):
+        clock = pygame.time.Clock()
+        keep_going = True
+
+        while keep_going:
+            clock.tick(60)
+            
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    keep_going = False
+                    break
+                elif event.type == pygame.KEYDOWN:
+                    if self.game_state == "playing":
+                        if event.key == pygame.K_1:
+                            self.handle_answer(0)
+                        elif event.key == pygame.K_2:
+                            self.handle_answer(1)
+                        elif event.key == pygame.K_3:
+                            self.handle_answer(2)
+                    elif self.game_state == "finished":
+                        percentage = (self.score / len(self.questions)) * 100
+                        if percentage < 50:
+                            # Must restart if failed
+                            if event.key == pygame.K_r:
+                                # Reset quiz
+                                self.current_question = 0
+                                self.score = 0
+                                self.game_state = "playing"
+                                self.feedback_timer = 0
+                        else:
+                            # Can continue if passed
+                            if event.key == pygame.K_SPACE:
+                                keep_going = False
+                                break
+            
+            # Update feedback timer
+            if self.feedback_timer > 0:
+                self.feedback_timer -= 1
+                if self.feedback_timer == 0:
+                    self.current_question += 1
+                    if self.current_question >= len(self.questions):
+                        self.game_state = "finished"
+                    else:
+                        self.game_state = "playing"
+            
+            # Draw
+            self.screen.fill(self.bg_color)
+            
+            # Title
+            title = self.title_font.render("Logic Trial - Animal Quiz", True, self.text_color)
+            self.screen.blit(title, (500 - title.get_width() // 2, 10))
+            
+            self.draw_progress_bar()
+            
+            if self.game_state == "finished":
+                self.draw_results()
+            elif self.game_state in ["correct", "wrong"]:
+                self.draw_feedback()
+            else:
+                self.draw_question()
+            
+            pygame.display.flip()
