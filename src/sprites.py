@@ -1,5 +1,4 @@
 import pygame
-import logic, data
 
 class Sprites(pygame.sprite.Sprite):
     def __init__(self, x=0, y=0, width=32, height=32, image=None, *groups):
@@ -38,13 +37,13 @@ class Sprites(pygame.sprite.Sprite):
 class Player(Sprites):
     def __init__(self, x=120, y=120):
         player_image = pygame.image.load("images/basetux.png").convert_alpha()
-        player_image = pygame.transform.smoothscale(player_image, (80, 120))
+        player_image = pygame.transform.smoothscale(player_image, (40, 60))
         super().__init__(x=x, y=y, width=40, height=60, image=player_image)
         self.health = 3
         self.speed = 310
-        self.jump = 900
+        self.jump = 800
         self.abilities = []
-        self.on_ground = False
+        self.on_ground = True
 
         self.base = pygame.image.load("images/basetux.png").convert_alpha()
         self.base = pygame.transform.smoothscale(self.base, (40, 60))
@@ -55,30 +54,41 @@ class Player(Sprites):
         self.tux_right = pygame.image.load("images/tux-right.png").convert_alpha()
         self.tux_right = pygame.transform.smoothscale(self.tux_right, (40, 60))
 
+        self.falling_tux = pygame.image.load("images/falling-tux.png").convert_alpha()
+        self.falling_tux = pygame.transform.smoothscale(self.falling_tux, (60, 60))
+
     def movement(self, keys):
         self.vel.x = 0
 
-        no_key_pressed = True
-
         if keys[pygame.K_a]:
             self.vel.x = -self.speed
-            self.direction = "left"
-            no_key_pressed = False
-            self.change_direction()
 
         elif keys[pygame.K_d]:
             self.vel.x = self.speed
-            self.direction = "right"
-            no_key_pressed = False
-            self.change_direction()
 
         if (keys[pygame.K_w] or keys[pygame.K_SPACE]) and self.on_ground:
             self.vel.y = -self.jump
             self.on_ground = False
 
-        if no_key_pressed:
+        # Update sprite based on state
+        self.update_sprite()
+
+    def update_sprite(self):
+        # Use velocity check to prevent glitching
+        if abs(self.vel.y) > 50:
+            # Falling or jumping with significant velocity
+            self.direction = "down"
+        elif self.vel.x < 0:
+            # Moving left
+            self.direction = "left"
+        elif self.vel.x > 0:
+            # Moving right
+            self.direction = "right"
+        else:
+            # Standing still
             self.direction = "normal"
-            self.change_direction()
+        
+        self.change_direction()
 
     def change_direction(self):
         if self.direction == "normal":
@@ -87,6 +97,8 @@ class Player(Sprites):
             player_image = self.tux_right
         elif self.direction == "left":
             player_image = self.tux_left
+        elif self.direction == "down":
+            player_image = self.falling_tux
         
         self.image = player_image
         self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
@@ -115,6 +127,7 @@ class Enemy(Sprites):
 
 class Environment(Sprites):
     def __init__(self):
+        import logic, data
         pygame.init()
         pygame.display.set_caption("Pebbles and Ice")
         self.loading = data.PlayerStats()

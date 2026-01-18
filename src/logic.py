@@ -1,5 +1,6 @@
 import pygame
 from data import PlayerStats
+from sprites import Player
 class Logic:
     def __init__(self):
         pass
@@ -136,12 +137,96 @@ class Physics:
 
 class LevelManager:
     def __init__(self):
-        super().__init__()
+        self.water_x = 0
+        # Load all images once
+        self.water_img = pygame.image.load("images/water.png")
+        self.water_img = pygame.transform.smoothscale(self.water_img, (50, 50))
+        
+        self.big_platform_img = pygame.image.load("images/big-platform.png")
+        self.big_platform_img = pygame.transform.scale(self.big_platform_img, (350, 100))
+        
+        self.small_platform_img = pygame.image.load("images/small-platform.png")
+        self.small_platform_img = pygame.transform.scale(self.small_platform_img, (150, 50))
+        
+        self.ice_platform_img = pygame.image.load("images/big-ice-platform.png")
+        
+        self.portal_img = pygame.image.load("images/portal.png")
+        self.portal_img = pygame.transform.smoothscale(self.portal_img, (80, 100))
 
-    def start_level(self):
+    def level_1(self, screen, physics, player, game_bg, clock):
+        # Use pre-loaded images
+        water_img = self.water_img
+        water_speed = 150  # pixels per second
+        water_y = screen.get_height() - water_img.get_height()
+
+        dt = clock.tick(60) / 1000
+
+        # Resize big platform for level 1 only
+        big_platform = pygame.transform.scale(self.big_platform_img, (250, 80))
+
+        # Level 1: 7 platforms with variety - ascending to portal at top
+        platforms = [
+            {'img': self.small_platform_img, 'x': 435, 'y': 450, 'w': 150, 'h': 50},
+            {'img': self.ice_platform_img, 'x': 650, 'y': 380, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height()},
+            {'img': big_platform, 'x': 130, 'y': 300, 'w': 250, 'h': 70},
+            {'img': big_platform, 'x': 50, 'y': 535, 'w': 250, 'h': 70},
+            {'img': self.small_platform_img, 'x': 600, 'y': 250, 'w': 150, 'h': 50},
+            {'img': self.small_platform_img, 'x': 750, 'y': 100, 'w': 150, 'h': 50},
+        ]
+        
+        # Create collision rects
+        platform_rects = [pygame.Rect(p['x'], p['y'], p['w'], p['h']) for p in platforms]
+
+        # Add invisible walls around the screen
+        left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
+        right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
+        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
+
+        water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height(), screen.get_width(), water_img.get_height())
+
+        # Update water position (move left)
+        self.water_x -= water_speed * dt
+        
+        # Reset water position when one tile cycle is complete
+        water_width = water_img.get_width()
+        if self.water_x <= -water_width:
+            self.water_x = 0
+
+        screen.blit(game_bg, (0, 0))
+        
+        # Draw water tiles continuously to fill entire screen width
+        screen_width = screen.get_width()
+        tiles_needed = (screen_width // water_width) + 2
+        
+        for i in range(tiles_needed):
+            screen.blit(water_img, (int(self.water_x + water_width * i), int(water_y)))
+        
+        # Draw all platforms
+        for p in platforms:
+            screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Draw portal on the highest platform
+        portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
+        portal_y = platforms[-1]['y'] - 100
+        screen.blit(self.portal_img, (portal_x, portal_y))
+
+        physics.apply_gravity(player, dt)
+        player.update(dt)
+        physics.handle_collisions(player, platform_rects + [water_hitbox, left_wall, right_wall, ceiling])
+        physics.apply_friction(player, dt)
+
+        player.draw(screen)
+
+    def level_2(self):
         pass
 
-    def reset_level(self):
+    def level_3(self):
+        pass
+
+    def level_4(self):
+        pass
+
+    def level_5(self):
         pass
 
     def check_level_completion(self):
