@@ -82,6 +82,27 @@ class GameLevel:
                 text_rect = text.get_rect(center=(500, 300))
                 self.screen.blit(text, text_rect)
 
+            elif self.current_state =="level_3":
+                self.screen.fill((50, 50, 80))
+                font = pygame.font.Font(None, 72)
+                text = font.render("Level 3 - Coming Soon!", True, (255, 255, 255))
+                text_rect = text.get_rect(center=(500, 300))
+                self.screen.blit(text, text_rect)
+
+            elif self.current_state =="level_4":
+                self.screen.fill((50, 50, 80))
+                font = pygame.font.Font(None, 72)
+                text = font.render("Level 4 - Coming Soon!", True, (255, 255, 255))
+                text_rect = text.get_rect(center=(500, 300))
+                self.screen.blit(text, text_rect)
+
+            elif self.current_state =="level_5":
+                self.screen.fill((50, 50, 80))
+                font = pygame.font.Font(None, 72)
+                text = font.render("Level 5 - Coming Soon!", True, (255, 255, 255))
+                text_rect = text.get_rect(center=(500, 300))
+                self.screen.blit(text, text_rect)
+
             pygame.display.flip()
 
 
