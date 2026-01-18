@@ -20,7 +20,11 @@ class FishFrenzy(Minigame):
         # List to store falling fish
         self.falling_fish = []
         self.spawn_timer = 0
-        self.spawn_delay = 30  # Spawn a new fish every 30 frames
+        self.spawn_delay = 30 # frames
+        
+        # Score counter
+        self.score = 0
+        self.font = pygame.font.Font(None, 48)
 
         self.loop()
 
@@ -32,7 +36,8 @@ class FishFrenzy(Minigame):
             'x': random.randint(0, 920),
             'y': -80,  # Start above the screen
             'speed': random.randint(3, 8),  # Random falling speed
-            'rotation': random.randint(0, 360)  # Random rotation
+            'rotation': random.randint(0, 360),  # Random rotation
+            'rect': pygame.Rect(0, 0, 250, 250)  # Collision rectangle
         }
         self.falling_fish.append(fish)
 
@@ -40,6 +45,9 @@ class FishFrenzy(Minigame):
         """Update positions of all falling fish"""
         for fish in self.falling_fish[:]:
             fish['y'] += fish['speed']
+            # Update collision rectangle position
+            fish['rect'].x = fish['x']
+            fish['rect'].y = fish['y']
             # Remove fish that have fallen off the screen
             if fish['y'] > 600:
                 self.falling_fish.remove(fish)
@@ -49,8 +57,15 @@ class FishFrenzy(Minigame):
         for fish in self.falling_fish:
             # Rotate the fish image
             rotated_fish = pygame.transform.rotate(self.fish_img, fish['rotation'])
-            fish_rect = rotated_fish.get_rect(center=(fish['x'] + 40, fish['y'] + 40))
+            fish_rect = rotated_fish.get_rect(center=(fish['x'] + 125, fish['y'] + 125))
             self.screen.blit(rotated_fish, fish_rect)
+    
+    def check_fish_click(self, mouse_pos):
+        for fish in self.falling_fish[:]:
+            if fish['rect'].collidepoint(mouse_pos):
+                self.falling_fish.remove(fish)
+                self.score += 1
+                break
 
     def loop(self):
         clock = pygame.time.Clock()
@@ -74,11 +89,20 @@ class FishFrenzy(Minigame):
             # Draw all falling fish
             self.draw_fish()
             
+            # Draw score
+            score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+            score_shadow = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
+            self.screen.blit(score_shadow, (12, 12))  # Shadow for readability
+            self.screen.blit(score_text, (10, 10))
+            
             pygame.display.flip()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     keep_going = False
                     break
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Left mouse button
+                        self.check_fish_click(event.pos)
 
 FishFrenzy()
