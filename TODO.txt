@@ -1,10 +1,47 @@
-1. Level 1,2,3,4,5
-2. Implement Minigames to the game
-3. Implement NPCs with dialouges (Dialouges found in chat.txt) 
-4. Save/load files. Add a function to put user and password for progress - Additionally, add a leaderboard if possible
-5. Shrink everything and make hitboxes correct
-6. Implement danger (Evil tux)
-7. Implement when touch water, die 
-8. Implement power ups (intelligence, double jump)
+1. Levels
+	- Design and implement all 5 levels with unique layouts, hazards, and platform types (ice, snow, water, etc.).
+	- Integrate minigame triggers and NPCs into levels.
 
-9. Draw Domino and pebble
+2. Minigames
+	- Complete and polish all minigames (IcePuzzle, BlizzardSurvival, FishFrenzy, Dodging Game).
+	- Integrate minigames with main game flow and NPCs.
+	- Add transitions and feedback for minigame start/end.
+
+3. NPCs and Dialogue
+	- Implement NPCs in levels with interactive dialogue (from chat.txt).
+	- Trigger minigames and give hints via NPCs.
+	- Add visual and audio feedback for dialogue.
+
+4. Save/Load, User System, Leaderboard
+	- Implement save/load system for player progress, abilities, and fish count.
+	- Add user authentication (username/password).
+	- Create a leaderboard to track high scores/fish.
+
+5. Player, Hitboxes, and Scaling
+	- Refine player and object hitboxes for accurate collisions.
+	- Adjust sprite scaling for consistency and gameplay clarity.
+
+6. Enemies and Hazards
+	- Implement Evil Tux enemy logic and movement.
+	- Add hazards (water, spikes, moving platforms, etc.).
+	- Handle player death and respawn (lose fish, restart level).
+
+7. Water and Death
+	- Implement water collision and death mechanic (restart level, lose fish).
+
+8. Power-ups and Abilities
+	- Implement intelligence and double jump power-ups.
+	- Add UI/visual feedback for unlocked abilities.
+
+9. Domino and Pebble
+	- Draw and add Domino NPC and pebble object.
+	- Implement end-game sequence with Domino.
+
+10. UI and Feedback
+	 - Add health bar, fish counter, and ability indicators.
+	 - Implement sound effects and background music.
+	 - Add achievement system and notifications.
+
+11. Game Flow and Polish
+	 - Implement pause and restart functionality.
+	 - Add win/game end screen and credits.

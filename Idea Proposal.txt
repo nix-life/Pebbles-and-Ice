@@ -1,0 +1,34 @@
+Description and goal:
+Our game's name is Pebbles and Ice. In our game, the main character is a penguin called Tux, who goes around and
+tries to achieve the end of the game. Tux has to go through many levels and platforms, all while helping side
+characters and playing minigames to achieve his final goal of meeting his best friend, Domino and getting fish as a
+reward. As he moves on to higher levels, Tux will get more powers, but the levels will also get progressively harder.
+Core Actions:
+The main fundamental actions we have in the game are moving up, down, left and right. The game will have many
+different surfaces with things like ice, making the penguin slip and slide. We will also have a double jump feature
+unlocked after a certain level. In our minigames, the penguin must solve problems and dodge obstacles to progress.
+Rules:
+Overall Goal: Must finish the level and all minigames before progressing to the next level. Objectives: Must finish
+minigames and win the level without falling into the water. If you do, you must restart the level. Physics: In the main
+game, the physics will be simply a gravitational pull down to the ground, as well as friction when it comes to different
+surfaces (for example, we will have ice that is harder to control and snow that will make you slower). Consequences:
+If you fail a level, you must restart, and you will lose all of the fish that you have gained in that level
+Feedback Systems:
+The game provides clear feedback through visual, audio, and narrative cues. Animations will show success or failure,
+such as Tux spinning when jumping or splashing into water. Sound effects for collecting fish and beating levels. The
+dynamic music will change throughout the game. The health bar can help keep track of Tux’s status. NPCs provide
+reactions to progress, hints, etc.
+Progression:
+The player goes through more challenging levels, unlocking abilities, such as sliding at level 2 or double jumping at
+level 4. Levels will bring harder obstacles and smarter enemies. Optional exploration areas for engagement.
+Challenges and Obstacles:
+NPCs: There will be evil penguins that will try to stop the player. If the player touches these evil penguins, they will
+die and have to restart (as well as lose all their fish). There will also be water pools that the penguin can fall into and
+drown. Finally, there will be many different puzzles and minigames that might simulate weather or a timed game that
+the player has to complete or survive.
+Reward Systems:
+Through every level, the player is rewarded, which includes collectible fish, new abilities, story progression rewards,
+and achievements. These can be obtained through puzzles, fishing minigames, etc. These are here to motivate
+players to explore and engage with the world.
+Interactivity:
+The player will interact with NPCs in this game; they will be able to interact and get more informati
