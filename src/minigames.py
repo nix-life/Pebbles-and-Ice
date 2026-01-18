@@ -19,9 +19,53 @@ class IcePuzzle(Minigame):
     def __init__(self):
         super().__init__()
 
+        pygame.init()
+        self.screen = pygame.display.set_mode((1000, 600))
+        pygame.display.set_caption("Ice Puzzle")
+
+        self.loop()
+
+        pygame.quit()
+
+    def loop(self):
+        clock = pygame.time.Clock()
+        keep_going = True
+
+        while keep_going:
+            clock.tick(60)
+            
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    keep_going = False
+                    break
+
 class BlizzardSurvival(Minigame):
     def __init__(self):
         super().__init__()
+
+        pygame.init()
+        self.screen = pygame.display.set_mode((1000, 600))
+        pygame.display.set_caption("Blizzard Survival")
+
+        self.loop()
+
+        pygame.quit()
+
+    def loop(self):
+        clock = pygame.time.Clock()
+        keep_going = True
+
+        while keep_going:
+            clock.tick(60)
+            
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    keep_going = False
+                    break
 class FishFrenzy(Minigame):
     def __init__(self):
         super().__init__()
