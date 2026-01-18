@@ -40,10 +40,14 @@ class Player(Sprites):
         player_image = pygame.transform.smoothscale(player_image, (40, 60))
         super().__init__(x=x, y=y, width=40, height=60, image=player_image)
         self.health = 3
+        self.lives = 3
         self.speed = 310
         self.jump = 800
         self.abilities = []
         self.on_ground = True
+        self.on_ice = False  # Track if player is on ice platform
+        self.spawn_x = x  # Store spawn position
+        self.spawn_y = y
 
         self.base = pygame.image.load("images/basetux.png").convert_alpha()
         self.base = pygame.transform.smoothscale(self.base, (40, 60))
@@ -58,13 +62,23 @@ class Player(Sprites):
         self.falling_tux = pygame.transform.smoothscale(self.falling_tux, (60, 60))
 
     def movement(self, keys):
-        self.vel.x = 0
-
-        if keys[pygame.K_a]:
-            self.vel.x = -self.speed
-
-        elif keys[pygame.K_d]:
-            self.vel.x = self.speed
+        # On ice, movement is slower and adds to existing velocity (sliding)
+        if self.on_ice:
+            ice_acceleration = 15  # How fast player accelerates on ice
+            if keys[pygame.K_a]:
+                self.vel.x -= ice_acceleration
+            elif keys[pygame.K_d]:
+                self.vel.x += ice_acceleration
+            # Clamp max speed on ice
+            max_ice_speed = self.speed * 1.2
+            self.vel.x = max(-max_ice_speed, min(max_ice_speed, self.vel.x))
+        else:
+            # Normal ground - direct control
+            self.vel.x = 0
+            if keys[pygame.K_a]:
+                self.vel.x = -self.speed
+            elif keys[pygame.K_d]:
+                self.vel.x = self.speed
 
         if (keys[pygame.K_w] or keys[pygame.K_SPACE]) and self.on_ground:
             self.vel.y = -self.jump
@@ -104,10 +118,22 @@ class Player(Sprites):
         self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
 
     def take_damage(self):
-        pass
+        self.lives -= 1
+        if self.lives <= 0:
+            return "game_over"
+        return "respawn"
 
     def reset_position(self):
-        pass
+        self.pos.x = self.spawn_x
+        self.pos.y = self.spawn_y
+        self.rect.topleft = (int(self.pos.x), int(self.pos.y))
+        self.vel.x = 0
+        self.vel.y = 0
+        self.on_ground = True
+        self.on_ice = False
+
+    def reset_lives(self):
+        self.lives = 3
 
 class Enemy(Sprites):
     def __init__(self):

@@ -3,7 +3,6 @@
 	- Integrate minigame triggers and NPCs into levels.
 
 2. Minigames
-	- Complete and polish all minigames (IcePuzzle, BlizzardSurvival, FishFrenz).
 	- Integrate minigames with main game flow and NPCs.
 	- Add transitions and feedback for minigame start/end.
 

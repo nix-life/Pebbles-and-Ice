@@ -78,6 +78,7 @@ class Physics:
         self.gravity = 2000
         self.max_fall_speed = 1600
         self.ground_friction = 1800
+        self.ice_friction = 150  # Much lower friction for ice - causes sliding
 
     def apply_gravity(self, player, dt):
         player.vel.y += self.gravity * dt
@@ -88,21 +89,30 @@ class Physics:
         if not getattr(player, "on_ground", False):
             return
 
-        friction = self.ground_friction if surface_friction is None else surface_friction
+        # Use ice friction if on ice, otherwise normal ground friction
+        if getattr(player, "on_ice", False):
+            friction = self.ice_friction
+        else:
+            friction = self.ground_friction if surface_friction is None else surface_friction
+        
         if player.vel.x > 0:
             player.vel.x = max(0, player.vel.x - friction * dt)
         elif player.vel.x < 0:
             player.vel.x = min(0, player.vel.x + friction * dt)
 
-    def handle_collisions(self, player, objects):
+    def handle_collisions(self, player, platforms, ice_platforms=None):
+        if ice_platforms is None:
+            ice_platforms = []
+        
         colliders = []
-        for obj in objects:
+        for obj in platforms:
             if hasattr(obj, "rect"):
                 colliders.append(obj.rect)
             else:
                 colliders.append(obj)
 
         player.on_ground = False
+        player.on_ice = False
 
         # Find the best collision to resolve
         for rect in colliders:
@@ -122,6 +132,9 @@ class Physics:
                     player.pos.y = player.rect.y
                     player.vel.y = 0
                     player.on_ground = True
+                    # Check if this platform is ice
+                    if rect in ice_platforms:
+                        player.on_ice = True
                 elif min_overlap == overlap_bottom and player.vel.y < 0:
                     player.rect.top = rect.bottom
                     player.pos.y = player.rect.y
@@ -135,9 +148,14 @@ class Physics:
                     player.pos.x = player.rect.x
                     player.vel.x = 0
 
+    def check_water_collision(self, player, water_rect):
+        return player.rect.colliderect(water_rect)
+
 class LevelManager:
     def __init__(self):
         self.water_x = 0
+        self.font = None  # Will be initialized when needed
+        
         # Load all images once
         self.water_img = pygame.image.load("images/water.png")
         self.water_img = pygame.transform.smoothscale(self.water_img, (50, 50))
@@ -152,8 +170,48 @@ class LevelManager:
         
         self.portal_img = pygame.image.load("images/portal.png")
         self.portal_img = pygame.transform.smoothscale(self.portal_img, (80, 100))
+        
+        # Death animation state
+        self.death_timer = 0
+        self.is_dying = False
+
+    def draw_lives(self, screen, player):
+        if self.font is None:
+            self.font = pygame.font.Font(None, 36)
+        
+        lives_text = self.font.render("Lives: " + str(player.lives), True, (255, 255, 255))
+        # Draw background box for visibility
+        bg_rect = pygame.Rect(10, 10, lives_text.get_width() + 20, 35)
+        pygame.draw.rect(screen, (0, 0, 0), bg_rect, border_radius=5)
+        pygame.draw.rect(screen, (100, 100, 100), bg_rect, 2, border_radius=5)
+        screen.blit(lives_text, (20, 15))
+        
+        # Draw heart icons
+        for i in range(player.lives):
+            heart_x = 130 + i * 30
+            pygame.draw.polygon(screen, (255, 50, 50), [
+                (heart_x, 25),
+                (heart_x - 8, 18),
+                (heart_x - 10, 12),
+                (heart_x - 6, 8),
+                (heart_x, 12),
+                (heart_x + 6, 8),
+                (heart_x + 10, 12),
+                (heart_x + 8, 18)
+            ])
 
     def level_1(self, screen, physics, player, game_bg, clock):
+        # Handle death animation
+        if self.is_dying:
+            self.death_timer -= 1
+            if self.death_timer <= 0:
+                self.is_dying = False
+                result = player.take_damage()
+                if result == "game_over":
+                    # Reset lives and restart
+                    player.reset_lives()
+                player.reset_position()
+        
         # Use pre-loaded images
         water_img = self.water_img
         water_speed = 150  # pixels per second
@@ -165,24 +223,26 @@ class LevelManager:
         big_platform = pygame.transform.scale(self.big_platform_img, (250, 80))
 
         # Level 1: 7 platforms with variety - ascending to portal at top
+        # Mark which platforms are ice with 'ice': True
         platforms = [
-            {'img': self.small_platform_img, 'x': 435, 'y': 450, 'w': 150, 'h': 50},
-            {'img': self.ice_platform_img, 'x': 650, 'y': 380, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height()},
-            {'img': big_platform, 'x': 130, 'y': 300, 'w': 250, 'h': 70},
-            {'img': big_platform, 'x': 50, 'y': 535, 'w': 250, 'h': 70},
-            {'img': self.small_platform_img, 'x': 600, 'y': 250, 'w': 150, 'h': 50},
-            {'img': self.small_platform_img, 'x': 750, 'y': 100, 'w': 150, 'h': 50},
+            {'img': self.small_platform_img, 'x': 435, 'y': 450, 'w': 150, 'h': 50, 'ice': False},
+            {'img': self.ice_platform_img, 'x': 650, 'y': 380, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
+            {'img': big_platform, 'x': 130, 'y': 300, 'w': 250, 'h': 70, 'ice': False},
+            {'img': big_platform, 'x': 50, 'y': 535, 'w': 250, 'h': 70, 'ice': False},
+            {'img': self.small_platform_img, 'x': 600, 'y': 250, 'w': 150, 'h': 50, 'ice': False},
+            {'img': self.small_platform_img, 'x': 750, 'y': 100, 'w': 150, 'h': 50, 'ice': False},
         ]
         
-        # Create collision rects
+        # Create collision rects and identify ice platforms
         platform_rects = [pygame.Rect(p['x'], p['y'], p['w'], p['h']) for p in platforms]
+        ice_platform_rects = [pygame.Rect(p['x'], p['y'], p['w'], p['h']) for p in platforms if p['ice']]
 
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
         right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
         ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
 
-        water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height(), screen.get_width(), water_img.get_height())
+        water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
 
         # Update water position (move left)
         self.water_x -= water_speed * dt
@@ -210,12 +270,30 @@ class LevelManager:
         portal_y = platforms[-1]['y'] - 100
         screen.blit(self.portal_img, (portal_x, portal_y))
 
-        physics.apply_gravity(player, dt)
-        player.update(dt)
-        physics.handle_collisions(player, platform_rects + [water_hitbox, left_wall, right_wall, ceiling])
-        physics.apply_friction(player, dt)
+        # Only update player if not dying
+        if not self.is_dying:
+            physics.apply_gravity(player, dt)
+            player.update(dt)
+            physics.handle_collisions(player, platform_rects + [left_wall, right_wall, ceiling], ice_platform_rects)
+            physics.apply_friction(player, dt)
+            
+            # Check water collision (death)
+            if physics.check_water_collision(player, water_hitbox):
+                self.is_dying = True
+                self.death_timer = 30  # Half second death animation
 
         player.draw(screen)
+        
+        # Draw lives UI
+        self.draw_lives(screen, player)
+        
+        # Draw death message if dying
+        if self.is_dying:
+            if self.font is None:
+                self.font = pygame.font.Font(None, 72)
+            death_text = self.font.render("Splash!", True, (255, 100, 100))
+            text_rect = death_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+            screen.blit(death_text, text_rect)
 
     def level_2(self):
         pass
