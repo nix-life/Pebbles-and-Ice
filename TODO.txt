@@ -1,9 +1,10 @@
 1. Level 1,2,3,4,5
-2. Minigames
-3. Implement NPCs with dialouges 
-4. Save/load files 
-5. Shrink everything
-6. Implement danger
+2. Implement Minigames to the game
+3. Implement NPCs with dialouges (Dialouges found in chat.txt) 
+4. Save/load files. Add a function to put user and password for progress - Additionally, add a leaderboard if possible
+5. Shrink everything and make hitboxes correct
+6. Implement danger (Evil tux)
 7. Implement when touch water, die 
 8. Implement power ups (intelligence, double jump)
-9. Fix up hitboxes 
+
+9. Draw Domino and pebble
