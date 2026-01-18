@@ -20,7 +20,7 @@ class FishFrenzy(Minigame):
         # List to store falling fish
         self.falling_fish = []
         self.spawn_timer = 0
-        self.spawn_delay = 30 # frames
+        self.spawn_delay = random.randint(20, 150) # frames
         
         # Score counter
         self.score = 0
@@ -90,9 +90,7 @@ class FishFrenzy(Minigame):
             self.draw_fish()
             
             # Draw score
-            score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
-            score_shadow = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
-            self.screen.blit(score_shadow, (12, 12))  # Shadow for readability
+            score_text = self.font.render("Score: %s" % self.score, True, (255, 255, 255))
             self.screen.blit(score_text, (10, 10))
             
             pygame.display.flip()
