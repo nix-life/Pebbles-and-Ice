@@ -410,7 +410,7 @@ class BlizzardSurvival(Minigame):
 
         pygame.init()
         self.screen = pygame.display.set_mode((1000, 600))
-        pygame.display.set_caption("Dodging Game - Survive!")
+        pygame.display.set_caption("Blizzard Survival - Dodge the Snowballs!")
         
         # Load Tux images
         self.tux_right = pygame.image.load("images/tux-right.png")
@@ -453,6 +453,7 @@ class BlizzardSurvival(Minigame):
         
         # Visual effects
         self.screen_shake = 0
+        self.flash_alpha = 0
         
         # Fonts
         self.font_large = pygame.font.Font(None, 72)
@@ -809,6 +810,3 @@ class FishFrenzy(Minigame):
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # Left mouse button
                         self.check_fish_click(event.pos)
-
-
-IcePuzzle()

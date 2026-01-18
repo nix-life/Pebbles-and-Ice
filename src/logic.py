@@ -155,6 +155,8 @@ class LevelManager:
     def __init__(self):
         self.water_x = 0
         self.font = None  # Will be initialized when needed
+        self.current_level = 1
+        self.level_complete = False
         
         # Load all images once
         self.water_img = pygame.image.load("images/water.png")
@@ -268,6 +270,7 @@ class LevelManager:
         # Draw portal on the highest platform
         portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
         portal_y = platforms[-1]['y'] - 100
+        portal_rect = pygame.Rect(portal_x, portal_y, 80, 100)
         screen.blit(self.portal_img, (portal_x, portal_y))
 
         # Only update player if not dying
@@ -281,6 +284,11 @@ class LevelManager:
             if physics.check_water_collision(player, water_hitbox):
                 self.is_dying = True
                 self.death_timer = 30  # Half second death animation
+            
+            # Check portal collision (level complete)
+            if player.rect.colliderect(portal_rect):
+                self.level_complete = True
+                return "portal"
 
         player.draw(screen)
         
@@ -294,6 +302,8 @@ class LevelManager:
             death_text = self.font.render("Splash!", True, (255, 100, 100))
             text_rect = death_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
             screen.blit(death_text, text_rect)
+        
+        return None
 
     def level_2(self):
         pass

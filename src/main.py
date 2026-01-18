@@ -1,6 +1,7 @@
 import pygame
 from sprites import Player, Environment
 from logic import Physics, LevelManager
+from minigames import BlizzardSurvival
 
 class GameLevel:
     def __init__(self):
@@ -14,6 +15,8 @@ class GameLevel:
         self.game_bg = pygame.image.load("images/game-background.png")
         self.game_bg = pygame.transform.smoothscale(self.game_bg, (1000, 600))
         self.clock = pygame.time.Clock()
+        
+        self.current_state = "level_1"  # Track game state
 
         self.loop()
 
@@ -43,8 +46,41 @@ class GameLevel:
 
             if not self.event_handling():
                 keep_going = False
+                break
 
-            self.level_manager.level_1(self.screen, self.physics, self.player, self.game_bg, self.clock)
+            if self.current_state == "level_1":
+                result = self.level_manager.level_1(self.screen, self.physics, self.player, self.game_bg, self.clock)
+                
+                if result == "portal":
+                    # Player reached the portal - start BlizzardSurvival minigame
+                    self.current_state = "minigame_blizzard"
+                    pygame.display.flip()
+                    
+                    # Run the BlizzardSurvival minigame
+                    BlizzardSurvival()
+                    
+                    # After minigame, reinitialize pygame display (minigame quit it)
+                    pygame.init()
+                    self.screen = pygame.display.set_mode((1000, 600))
+                    pygame.display.set_caption("Pebbles and Ice")
+                    
+                    # Move to next level or back to menu
+                    self.current_state = "level_2"
+                    self.level_manager.current_level = 2
+                    self.level_manager.level_complete = False
+                    
+                    # Reset player for next level
+                    self.player.reset_position()
+                    self.player.reset_lives()
+            
+            elif self.current_state == "level_2":
+                # TODO: Implement level 2
+                # For now, show a placeholder message
+                self.screen.fill((50, 50, 80))
+                font = pygame.font.Font(None, 72)
+                text = font.render("Level 2 - Coming Soon!", True, (255, 255, 255))
+                text_rect = text.get_rect(center=(500, 300))
+                self.screen.blit(text, text_rect)
 
             pygame.display.flip()
 
