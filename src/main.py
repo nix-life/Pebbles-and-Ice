@@ -82,6 +82,15 @@ class GameLevel:
                 text_rect = text.get_rect(center=(500, 300))
                 self.screen.blit(text, text_rect)
 
+            elif self.current_state =="level_3":
+                pass
+
+            elif self.current_state =="level_4":
+                pass
+
+            elif self.current_state =="level_5":
+                pass
+
             pygame.display.flip()
 
 
