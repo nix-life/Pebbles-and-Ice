@@ -12,11 +12,14 @@ class GameController:
         self.clock = pygame.time.Clock()
         self.boxes = {} 
         self.level = 1
+        self.view_stats_button = None
+        self.showing_stats = False
 
-    def update_game(self, screen, events):
+    def update_game(self, screen, events, save_data=None):
     
         small_font = pygame.font.SysFont("verdana", 48, bold=True)
         title_font = pygame.font.SysFont("Helvetica", 72, bold=True)
+        button_font = pygame.font.SysFont("verdana", 24, bold=True)
         text_surface = title_font.render("LEVELS", True, (0, 0, 160))
         text_rect = text_surface.get_rect(center=(500, 100))
         screen.blit(text_surface, text_rect)
@@ -46,10 +49,21 @@ class GameController:
             text_surface = small_font.render(str(level_num), True, (0, 0, 0))
             text_rect = text_surface.get_rect(center=(x + 62, y + 62))
             screen.blit(text_surface, text_rect)
+        
+        # Draw View Stats button in bottom right
+        self.view_stats_button = pygame.Rect(820, 520, 160, 60)
+        pygame.draw.rect(screen, (50, 50, 150), self.view_stats_button, border_radius=8)
+        pygame.draw.rect(screen, (100, 100, 255), self.view_stats_button, 3, border_radius=8)
+        stats_text = button_font.render("View Stats", True, (255, 255, 255))
+        stats_text_rect = stats_text.get_rect(center=self.view_stats_button.center)
+        screen.blit(stats_text, stats_text_rect)
 
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if self.boxes[1].collidepoint(event.pos):
+                if self.view_stats_button and self.view_stats_button.collidepoint(event.pos):
+                    if save_data:
+                        self.display_stats_screen(screen, save_data)
+                elif self.boxes[1].collidepoint(event.pos):
                     self.level = 1
                     return "start_game"
                 elif self.boxes[2].collidepoint(event.pos): 
@@ -65,6 +79,68 @@ class GameController:
                     self.level = 5
                     print("Level 5 selected")
                     
+    def display_stats_screen(self, screen, save_data):
+        """Display player statistics in a popup overlay"""
+        overlay = pygame.Surface((1000, 600))
+        overlay.set_alpha(200)
+        overlay.fill((0, 0, 0))
+        screen.blit(overlay, (0, 0))
+        
+        # Stats panel
+        panel_rect = pygame.Rect(150, 50, 700, 500)
+        pygame.draw.rect(screen, (30, 30, 60), panel_rect, border_radius=15)
+        pygame.draw.rect(screen, (100, 150, 255), panel_rect, 4, border_radius=15)
+        
+        # Title
+        title_font = pygame.font.SysFont("verdana", 36, bold=True)
+        title = title_font.render("Player Statistics", True, (100, 200, 255))
+        screen.blit(title, (500 - title.get_width() / 2, 70))
+        
+        # Stats content
+        stats_font = pygame.font.SysFont("verdana", 20)
+        y_offset = 120
+        
+        stats_lines = [
+            "Username: %s" % save_data.username,
+            "Highest Level Completed: %d" % save_data.highest_level_completed,
+            "Current Level: %d" % save_data.levels_reached,
+            "Fish Collected: %d" % save_data.fish_collected,
+            "Total Fish Ever: %d" % save_data.total_fish_ever,
+            "Total Deaths: %d" % save_data.total_deaths,
+            "Playtime: %.1f minutes" % (save_data.total_playtime / 60),
+            "",
+            "Abilities:",
+            "  Double Jump: %s" % ("Unlocked" if save_data.double_jump_unlocked else "Locked"),
+            "  Intelligence Boost: %s" % ("Unlocked" if save_data.intelligence_boost_unlocked else "Locked"),
+            "",
+            "Minigame Records:",
+            "  Logic Trial: %d" % save_data.logic_trial_best_score,
+            "  Blizzard Survival: %.1fs" % save_data.blizzard_survival_best_time,
+            "  Fish Frenzy: %d" % save_data.fish_frenzy_high_score,
+        ]
+        
+        for line in stats_lines:
+            text = stats_font.render(line, True, (255, 255, 255))
+            screen.blit(text, (200, y_offset))
+            y_offset += 25
+        
+        # Close instruction
+        close_font = pygame.font.SysFont("verdana", 20)
+        close_text = close_font.render("Click anywhere to close", True, (200, 200, 200))
+        screen.blit(close_text, (500 - close_text.get_width() / 2, 520))
+        
+        pygame.display.flip()
+        
+        # Wait for click to close
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return
+                elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
+                    waiting = False
+    
     def start_game(self):
         pass
 
@@ -214,6 +290,7 @@ class LevelManager:
                 if result == "game_over":
                     # Reset lives and restart
                     player.reset_lives()
+                    player.reset_fish_count()
                 player.reset_position()
                 # Track death in save data
                 if save_data:

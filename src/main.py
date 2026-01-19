@@ -58,6 +58,10 @@ class GameLevel:
             if not self.event_handling():
                 keep_going = False
                 break
+            
+            # Track playtime (dt calculated in level methods)
+            dt = self.clock.get_time() / 1000.0
+            self.save_data.add_playtime(dt)
 
             if self.current_state == "level_1":
                 level1 = self.level_manager.level_1(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)

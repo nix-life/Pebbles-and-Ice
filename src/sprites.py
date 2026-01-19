@@ -48,6 +48,7 @@ class Player(Sprites):
         self.on_ice = False  # Track if player is on ice platform
         self.spawn_x = x  # Store spawn position
         self.spawn_y = y
+        self.fish_collected_this_level = 0  # Track fish collected in current level attempt
 
         self.base = pygame.image.load("images/basetux.png").convert_alpha()
         self.base = pygame.transform.smoothscale(self.base, (40, 60))
@@ -134,6 +135,14 @@ class Player(Sprites):
 
     def reset_lives(self):
         self.lives = 3
+    
+    def reset_fish_count(self):
+        """Reset fish collected for current level attempt"""
+        self.fish_collected_this_level = 0
+    
+    def collect_fish(self):
+        """Add a fish to the current level count"""
+        self.fish_collected_this_level += 1
 
 class Enemy(Sprites):
     def __init__(self):
@@ -240,7 +249,7 @@ class Environment(Sprites):
                     return
                 
             self.screen.blit(self.game_bg, (0, 0))
-            result = self.game_control.update_game(self.screen, self.events)
+            result = self.game_control.update_game(self.screen, self.events, self.load_data)
             if result == "start_game":
                 from main import GameLevel
                 GameLevel(save_data=self.load_data)
