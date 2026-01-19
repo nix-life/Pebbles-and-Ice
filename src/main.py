@@ -1,7 +1,6 @@
 import pygame
 from sprites import Player, Environment
 from logic import Physics, LevelManager
-from minigames import BlizzardSurvival
 
 class GameLevel:
     def __init__(self):
@@ -49,22 +48,9 @@ class GameLevel:
                 break
 
             if self.current_state == "level_1":
-                result = self.level_manager.level_1(self.screen, self.physics, self.player, self.game_bg, self.clock)
-                
-                if result == "portal":
-                    # Player reached the portal - start BlizzardSurvival minigame
-                    self.current_state = "minigame_blizzard"
-                    pygame.display.flip()
-                    
-                    # Run the BlizzardSurvival minigame
-                    BlizzardSurvival()
-                    
-                    # After minigame, reinitialize pygame display (minigame quit it)
-                    pygame.init()
-                    self.screen = pygame.display.set_mode((1000, 600))
-                    pygame.display.set_caption("Pebbles and Ice")
-                    
-                    # Move to next level or back to menu
+                level1 = self.level_manager.level_1(self.screen, self.physics, self.player, self.game_bg, self.clock)
+
+                if level1 == "done":
                     self.current_state = "level_2"
                     self.level_manager.current_level = 2
                     self.level_manager.level_complete = False
@@ -72,6 +58,7 @@ class GameLevel:
                     # Reset player for next level
                     self.player.reset_position()
                     self.player.reset_lives()
+                
             
             elif self.current_state == "level_2":
                 # TODO: Implement level 2

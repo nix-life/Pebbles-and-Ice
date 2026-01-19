@@ -1,5 +1,6 @@
 import pygame
 from data import PlayerStats
+from minigames import BlizzardSurvival
 from sprites import Player
 class Logic:
     def __init__(self):
@@ -176,6 +177,7 @@ class LevelManager:
         # Death animation state
         self.death_timer = 0
         self.is_dying = False
+        self.feedback_timer = 0
 
     def draw_lives(self, screen, player):
         if self.font is None:
@@ -288,7 +290,7 @@ class LevelManager:
             # Check portal collision (level complete)
             if player.rect.colliderect(portal_rect):
                 self.level_complete = True
-                return "portal"
+                
 
         player.draw(screen)
         
@@ -301,9 +303,34 @@ class LevelManager:
                 self.font = pygame.font.Font(None, 72)
             death_text = self.font.render("Splash!", True, (255, 100, 100))
             text_rect = death_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+            
+            # Draw semi-transparent background
+            bg_surface = pygame.Surface((text_rect.width + 40, text_rect.height + 20))
+            bg_surface.fill((0, 0, 0))
+            bg_surface.set_alpha(180)
+            screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
+            
+            # Draw text
             screen.blit(death_text, text_rect)
         
-        return None
+        if self.level_complete:
+            win_text = self.font.render("Level 1 Finished!", True, (100, 255, 100))
+            text_rect = win_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+            
+            # Draw semi-transparent background
+            bg_surface = pygame.Surface((text_rect.width + 40, text_rect.height + 20))
+            bg_surface.fill((0, 0, 0))
+            bg_surface.set_alpha(180)
+            screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
+            
+            # Draw text
+            screen.blit(win_text, text_rect)
+
+            self.feedback_timer += 1
+            if self.feedback_timer >= 90:
+                self.feedback_timer = 0
+                return "done"
+
 
     def level_2(self):
         pass
