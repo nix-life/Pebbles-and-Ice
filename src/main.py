@@ -121,23 +121,62 @@ class GameLevel:
                     self.save_data.complete_level(3)
                     self.save_data.set_level_reached(4)
                     
+                    # Set spawn position for level 4
+                    self.player.spawn_x = 40
+                    self.player.spawn_y = 400
+                    
                     # Reset player for next level
                     self.player.reset_position()
                     self.player.reset_lives()
 
             elif self.current_state =="level_4":
-                self.screen.fill((50, 50, 80))
-                font = pygame.font.Font(None, 72)
-                text = font.render("Level 4 - Coming Soon!", True, (255, 255, 255))
-                text_rect = text.get_rect(center=(500, 300))
-                self.screen.blit(text, text_rect)
+                # Set spawn position for level 4
+                self.player.spawn_x = 40
+                self.player.spawn_y = 400
+                
+                level4 = self.level_manager.level_4(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
+
+                if level4 == "done":
+                    self.current_state = "level_5"
+                    self.level_manager.current_level = 5
+                    self.level_manager.level_complete = False
+                    
+                    # Update save data
+                    self.save_data.complete_level(4)
+                    self.save_data.set_level_reached(5)
+                    
+                    # Set spawn position for level 5
+                    self.player.spawn_x = 35
+                    self.player.spawn_y = 420
+                    
+                    # Reset player for next level
+                    self.player.reset_position()
+                    self.player.reset_lives()
 
             elif self.current_state =="level_5":
-                self.screen.fill((50, 50, 80))
+                # Set spawn position for level 5
+                self.player.spawn_x = 35
+                self.player.spawn_y = 420
+                
+                level5 = self.level_manager.level_5(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
+
+                if level5 == "done":
+                    # Game complete! Return to menu or show credits
+                    self.save_data.complete_level(5)
+                    # Could add a credits screen or return to menu here
+                    self.current_state = "game_complete"
+
+            elif self.current_state == "game_complete":
+                self.screen.fill((20, 20, 40))
                 font = pygame.font.Font(None, 72)
-                text = font.render("Level 5 - Coming Soon!", True, (255, 255, 255))
-                text_rect = text.get_rect(center=(500, 300))
+                text = font.render("Congratulations!", True, (255, 215, 0))
+                text_rect = text.get_rect(center=(500, 250))
                 self.screen.blit(text, text_rect)
+                
+                font2 = pygame.font.Font(None, 48)
+                text2 = font2.render("You completed all 5 levels!", True, (255, 255, 255))
+                text_rect2 = text2.get_rect(center=(500, 350))
+                self.screen.blit(text2, text_rect2)
             
             # Draw save message if active
             self.draw_save_message()
