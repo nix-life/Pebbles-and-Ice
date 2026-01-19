@@ -266,13 +266,9 @@ class NPC(Sprites):
     def __init__(self):
         super().__init__(width=40, height=60)
         self.dialogue = []
-        self.has_minigame = False
         self.hint = ""
 
     def talk(self):
-        pass
-
-    def give_hint(self):
         pass
 
     def start_minigame(self):

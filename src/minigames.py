@@ -71,7 +71,12 @@ class IcePuzzle(Minigame):
 
     def generate_path(self):
         """Generate a random path from left to right through the grid"""
-        self.grid = [[0 for _ in range(self.grid_cols)] for _ in range(self.grid_rows)]
+        self.grid = []
+        for row in range(self.grid_rows):
+            row_data = []
+            for col in range(self.grid_cols):
+                row_data.append(0)
+            self.grid.append(row_data)
         self.path = []
         
         # Start from a random row on the left side
@@ -205,7 +210,12 @@ class IcePuzzle(Minigame):
                         try:
                             current_path_index = self.path.index(self.player_pos)
                             hint_range = range(current_path_index + 1, min(current_path_index + 4, len(self.path)))
-                            if any(self.path[i] == tile_pos for i in hint_range):
+                            is_hint_tile = False
+                            for i in hint_range:
+                                if self.path[i] == tile_pos:
+                                    is_hint_tile = True
+                                    break
+                            if is_hint_tile:
                                 # Visible hint - pulsing cyan/green color
                                 pulse = abs((self.hint_timer % 20) - 10) / 10  # Pulse 0-1
                                 hint_r = int(100 + pulse * 50)
@@ -248,7 +258,6 @@ class IcePuzzle(Minigame):
             
             # Shrinking circle as player falls
             size = max(5, 15 - self.fall_offset / 10)
-            alpha = max(0, 255 - self.fall_offset * 3)
             
             pygame.draw.circle(self.screen, (50, 100, 200), (center_x, center_y), size)
         else:
@@ -472,7 +481,11 @@ class BlizzardSurvival(Minigame):
         # As time progresses, favor faster ball types (after 15 seconds)
         time_seconds = self.game_time / 60
         if time_seconds > 15 and random.random() < 0.5:
-            ball_type = random.choice([b for b in self.ball_types if b['speed'] >= 6])
+            fast_balls = []
+            for b in self.ball_types:
+                if b['speed'] >= 6:
+                    fast_balls.append(b)
+            ball_type = random.choice(fast_balls)
         
         ball = {
             'x': random.randint(50, 920),
@@ -551,8 +564,11 @@ class BlizzardSurvival(Minigame):
             center_y = int(ball['y'])
             
             # Outer glow
+            glow_components = []
             for c in ball['color']:
-                glow_color = tuple(min(255, c + 50))
+                glow_value = min(255, c + 50)
+                glow_components.append(glow_value)
+            glow_color = tuple(glow_components)
             pygame.draw.circle(self.screen, glow_color, (center_x, center_y), ball['size'] / 2 + 3)
             
             # Main ball

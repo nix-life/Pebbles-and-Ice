@@ -365,8 +365,14 @@ class LevelManager:
         ]
         
         # Create collision rects and identify ice platforms
-        platform_rects = [pygame.Rect(p['x'], p['y'], p['w'], p['h']) for p in platforms]
-        ice_platform_rects = [pygame.Rect(p['x'], p['y'], p['w'], p['h']) for p in platforms if p['ice']]
+        platform_rects = []
+        for p in platforms:
+            platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
+        
+        ice_platform_rects = []
+        for p in platforms:
+            if p['ice']:
+                ice_platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
 
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
@@ -459,8 +465,145 @@ class LevelManager:
                 return "done"
 
 
-    def level_2(self):
-        pass
+    def level_2(self, screen, physics, player, game_bg, clock, save_data=None):
+        # Handle death animation
+        if self.is_dying:
+            self.death_timer -= 1
+            if self.death_timer <= 0:
+                self.is_dying = False
+                result = player.take_damage()
+                if result == "game_over":
+                    # Reset lives and restart
+                    player.reset_lives()
+                    player.reset_fish_count()
+                player.reset_position()
+                # Track death in save data
+                if save_data:
+                    save_data.add_death()
+        
+        # Use pre-loaded images
+        water_img = self.water_img
+        water_speed = 180  # Faster water than level 1
+        water_y = screen.get_height() - water_img.get_height()
+
+        dt = clock.tick(60) / 1000
+
+        # Resize platforms for level 2
+        big_platform = pygame.transform.scale(self.big_platform_img, (200, 70))
+        small_platform = pygame.transform.scale(self.small_platform_img, (120, 40))
+
+        # Level 2: Harder layout with 2 ice platforms and more gaps
+        platforms = [
+            {'img': big_platform, 'x': 50, 'y': 530, 'w': 200, 'h': 70, 'ice': False},
+            {'img': small_platform, 'x': 300, 'y': 470, 'w': 120, 'h': 40, 'ice': False},
+            {'img': small_platform, 'x': 200, 'y': 330, 'w': 120, 'h': 40, 'ice': False},
+            {'img': self.ice_platform_img, 'x': 380, 'y': 250, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
+            {'img': small_platform, 'x': 620, 'y': 200, 'w': 120, 'h': 40, 'ice': False},
+            {'img': big_platform, 'x': 750, 'y': 120, 'w': 200, 'h': 70, 'ice': False},
+        ]
+        
+        # Create collision rects and identify ice platforms
+        for p in platforms:
+            p['w'] = p['img'].get_width()
+            p['h'] = p['img'].get_height()
+            platform_rects = [pygame.Rect(p['x'], p['y'], p['w'], p['h'])]
+        
+        ice_platform_rects = []
+        for p in platforms:
+            if p['ice']:
+                ice_platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
+
+        # Add invisible walls around the screen
+        left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
+        right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
+        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
+
+        water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
+
+        # Update water position (move left)
+        self.water_x -= water_speed * dt
+        
+        # Reset water position when one tile cycle is complete
+        water_width = water_img.get_width()
+        if self.water_x <= -water_width:
+            self.water_x = 0
+
+        screen.blit(game_bg, (0, 0))
+        
+        # Draw water tiles continuously to fill entire screen width
+        screen_width = screen.get_width()
+        tiles_needed = (screen_width // water_width) + 2
+        
+        for i in range(tiles_needed):
+            screen.blit(water_img, (int(self.water_x + water_width * i), int(water_y)))
+        
+        # Draw all platforms
+        for p in platforms:
+            screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Draw portal on the highest platform (top right)
+        portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
+        portal_y = platforms[-1]['y'] - 100
+        portal_rect = pygame.Rect(portal_x, portal_y, 80, 100)
+        screen.blit(self.portal_img, (portal_x, portal_y))
+
+        # Only update player if not dying
+        if not self.is_dying:
+            physics.apply_gravity(player, dt)
+            player.update(dt)
+            physics.handle_collisions(player, platform_rects + [left_wall, right_wall, ceiling], ice_platform_rects)
+            physics.apply_friction(player, dt)
+            
+            # Check water collision (death)
+            if physics.check_water_collision(player, water_hitbox):
+                self.is_dying = True
+                self.death_timer = 30  # Half second death animation
+            
+            # Check portal collision (level complete)
+            if player.rect.colliderect(portal_rect):
+                self.level_complete = True
+                
+
+        player.draw(screen)
+        
+        # Draw lives UI
+        self.draw_lives(screen, player)
+        
+        # Draw death message if dying
+        if self.is_dying:
+            if self.font is None:
+                self.font = pygame.font.Font(None, 72)
+            death_text = self.font.render("Splash!", True, (255, 100, 100))
+            text_rect = death_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+            
+            # Draw semi-transparent background
+            bg_surface = pygame.Surface((text_rect.width + 40, text_rect.height + 20))
+            bg_surface.fill((0, 0, 0))
+            bg_surface.set_alpha(180)
+            screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
+            
+            # Draw text
+            screen.blit(death_text, text_rect)
+        
+        if self.level_complete:
+            if self.font is None:
+                self.font = pygame.font.Font(None, 72)
+            win_text = self.font.render("Level 2 Finished!", True, (100, 255, 100))
+            text_rect = win_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+            
+            # Draw semi-transparent background
+            bg_surface = pygame.Surface((text_rect.width + 40, text_rect.height + 20))
+            bg_surface.fill((0, 0, 0))
+            bg_surface.set_alpha(180)
+            screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
+            
+            # Draw text
+            screen.blit(win_text, text_rect)
+
+            self.feedback_timer += 1
+            if self.feedback_timer >= 90:
+                self.feedback_timer = 0
+                return "done"
 
     def level_3(self):
         pass

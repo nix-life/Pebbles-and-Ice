@@ -86,13 +86,20 @@ class GameLevel:
                 
             
             elif self.current_state == "level_2":
-                # TODO: Implement level 2
-                # For now, show a placeholder message
-                self.screen.fill((50, 50, 80))
-                font = pygame.font.Font(None, 72)
-                text = font.render("Level 2 - Coming Soon!", True, (255, 255, 255))
-                text_rect = text.get_rect(center=(500, 300))
-                self.screen.blit(text, text_rect)
+                level2 = self.level_manager.level_2(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
+
+                if level2 == "done":
+                    self.current_state = "level_3"
+                    self.level_manager.current_level = 3
+                    self.level_manager.level_complete = False
+                    
+                    # Update save data
+                    self.save_data.complete_level(2)
+                    self.save_data.set_level_reached(3)
+                    
+                    # Reset player for next level
+                    self.player.reset_position()
+                    self.player.reset_lives()
 
             elif self.current_state =="level_3":
                 self.screen.fill((50, 50, 80))
