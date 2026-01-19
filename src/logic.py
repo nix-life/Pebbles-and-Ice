@@ -506,8 +506,8 @@ class LevelManager:
 
         # Level 2: Harder layout with 2 ice platforms and more gaps
         platforms = [
-            {'img': big_platform, 'x': 50, 'y': 530, 'w': 200, 'h': 70, 'ice': False},
-            {'img': small_platform, 'x': 300, 'y': 470, 'w': 120, 'h': 40, 'ice': False},
+            {'img': big_platform, 'x': 50, 'y': 480, 'w': 200, 'h': 70, 'ice': False},
+            {'img': small_platform, 'x': 300, 'y': 420, 'w': 120, 'h': 40, 'ice': False},
             {'img': small_platform, 'x': 200, 'y': 330, 'w': 120, 'h': 40, 'ice': False},
             {'img': self.ice_platform_img, 'x': 380, 'y': 250, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
             {'img': small_platform, 'x': 620, 'y': 200, 'w': 120, 'h': 40, 'ice': False},
@@ -515,10 +515,11 @@ class LevelManager:
         ]
         
         # Create collision rects and identify ice platforms
+        platform_rects = []
         for p in platforms:
             p['w'] = p['img'].get_width()
             p['h'] = p['img'].get_height()
-            platform_rects = [pygame.Rect(p['x'], p['y'], p['w'], p['h'])]
+            platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
         
         ice_platform_rects = []
         for p in platforms:

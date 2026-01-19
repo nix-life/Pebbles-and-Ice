@@ -80,12 +80,20 @@ class GameLevel:
                     self.save_data.complete_level(1)
                     self.save_data.set_level_reached(2)
                     
+                    # Set spawn position for level 2 before reset
+                    self.player.spawn_x = 80
+                    self.player.spawn_y = 350
+                    
                     # Reset player for next level
                     self.player.reset_position()
                     self.player.reset_lives()
                 
             
             elif self.current_state == "level_2":
+                # Set spawn position for level 2 (first platform at x=50, y=480)
+                self.player.spawn_x = 80
+                self.player.spawn_y = 350  # Above the platform
+                
                 level2 = self.level_manager.level_2(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
                 if level2 == "done":
