@@ -1,10 +1,7 @@
 1. Levels
 	- Design and implement all 5 levels with unique layouts, hazards, and platform types (ice, snow, water, etc.).
 	- Integrate minigame triggers and NPCs into levels.
-
-2. Minigames
-	- Integrate minigames with main game flow and NPCs.
-	- Add transitions and feedback for minigame start/end.
+    - Missing 2, 3, 4, 5
 
 3. NPCs and Dialogue
 	- Implement NPCs in levels with interactive dialogue (from chat.txt).
@@ -16,17 +13,10 @@
 	- Add user authentication (username/password).
 	- Create a leaderboard to track high scores/fish.
 
-5. Player, Hitboxes, and Scaling
-	- Refine player and object hitboxes for accurate collisions.
-	- Adjust sprite scaling for consistency and gameplay clarity.
-
 6. Enemies and Hazards
 	- Implement Evil Tux enemy logic and movement.
 	- Add hazards (water, spikes, moving platforms, etc.).
 	- Handle player death and respawn (lose fish, restart level).
-
-7. Water and Death
-	- Implement water collision and death mechanic (restart level, lose fish).
 
 8. Power-ups and Abilities
 	- Implement intelligence and double jump power-ups.
