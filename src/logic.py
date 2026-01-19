@@ -100,7 +100,6 @@ class GameController:
                 elif self.boxes[2].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 1:
                         self.level = 2
-                        print("Level 2 selected")
                         return "start_game"
                     else:
                         print("Level 2 is locked - complete Level 1 first")
@@ -296,6 +295,19 @@ class LevelManager:
         
         self.portal_img = pygame.image.load("images/portal.png")
         self.portal_img = pygame.transform.smoothscale(self.portal_img, (80, 100))
+        
+        # Evil tux enemy
+        self.evil_tux_img = pygame.image.load("images/tux-left.png")
+        self.evil_tux_img = pygame.transform.smoothscale(self.evil_tux_img, (40, 60))
+        # Tint it red to make it evil looking
+        self.evil_tux_img.fill((255, 100, 100), special_flags=pygame.BLEND_MULT)
+        
+        # Level 3 enemy state
+        self.evil_tux_x = 0
+        self.evil_tux_y = 0
+        self.evil_tux_speed = 100
+        self.evil_tux_direction = 1  # 1 = right, -1 = left
+        self.evil_tux_platform = None  # Platform the enemy is on
         
         # Death animation state
         self.death_timer = 0
@@ -605,8 +617,195 @@ class LevelManager:
                 self.feedback_timer = 0
                 return "done"
 
-    def level_3(self):
-        pass
+    def level_3(self, screen, physics, player, game_bg, clock, save_data=None):
+        # Handle death animation
+        if self.is_dying:
+            self.death_timer -= 1
+            if self.death_timer <= 0:
+                self.is_dying = False
+                result = player.take_damage()
+                if result == "game_over":
+                    # Reset lives and restart
+                    player.reset_lives()
+                    player.reset_fish_count()
+                player.reset_position()
+                # Track death in save data
+                if save_data:
+                    save_data.add_death()
+        
+        # Use pre-loaded images
+        water_img = self.water_img
+        water_speed = 200  # Even faster water
+        water_y = screen.get_height() - water_img.get_height()
+
+        dt = clock.tick(60) / 1000
+
+        # Smaller platforms for level 3
+        small_platform = pygame.transform.scale(self.small_platform_img, (100, 35))
+        tiny_platform = pygame.transform.scale(self.small_platform_img, (80, 30))
+        medium_platform = pygame.transform.scale(self.big_platform_img, (150, 50))
+
+        # Level 3: Longer layout with smaller platforms and more spread out
+        platforms = [
+            {'img': medium_platform, 'x': 30, 'y': 530, 'w': 150, 'h': 50, 'ice': False},
+            {'img': tiny_platform, 'x': 220, 'y': 480, 'w': 80, 'h': 30, 'ice': False},
+            {'img': small_platform, 'x': 350, 'y': 420, 'w': 100, 'h': 35, 'ice': False},
+            {'img': self.ice_platform_img, 'x': 500, 'y': 350, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
+            {'img': tiny_platform, 'x': 350, 'y': 280, 'w': 80, 'h': 30, 'ice': False},
+            {'img': medium_platform, 'x': 480, 'y': 200, 'w': 150, 'h': 50, 'ice': False, 'has_enemy': True},
+            {'img': tiny_platform, 'x': 700, 'y': 150, 'w': 80, 'h': 30, 'ice': False},
+            {'img': small_platform, 'x': 850, 'y': 100, 'w': 100, 'h': 35, 'ice': False},
+        ]
+        
+        # Create collision rects and identify ice platforms
+        platform_rects = []
+        for p in platforms:
+            platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
+        
+        ice_platform_rects = []
+        for p in platforms:
+            if p['ice']:
+                ice_platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
+        
+        # Find enemy platform
+        enemy_platform = None
+        for p in platforms:
+            if p.get('has_enemy', False):
+                enemy_platform = p
+                break
+        
+        # Initialize evil tux position on first run
+        if enemy_platform and self.evil_tux_platform is None:
+            self.evil_tux_platform = enemy_platform
+            self.evil_tux_x = enemy_platform['x']
+            self.evil_tux_y = enemy_platform['y'] - 60
+
+        # Add invisible walls around the screen
+        left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
+        right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
+        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
+
+        water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
+
+        # Update water position (move left)
+        self.water_x -= water_speed * dt
+        
+        # Reset water position when one tile cycle is complete
+        water_width = water_img.get_width()
+        if self.water_x <= -water_width:
+            self.water_x = 0
+
+        screen.blit(game_bg, (0, 0))
+        
+        # Draw water tiles continuously to fill entire screen width
+        screen_width = screen.get_width()
+        tiles_needed = (screen_width // water_width) + 2
+        
+        for i in range(tiles_needed):
+            screen.blit(water_img, (int(self.water_x + water_width * i), int(water_y)))
+        
+        # Draw all platforms
+        for p in platforms:
+            screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Update and draw evil tux
+        if enemy_platform and not self.is_dying:
+            # Move evil tux along platform
+            self.evil_tux_x += self.evil_tux_speed * self.evil_tux_direction * dt
+            
+            # Bounce at platform edges
+            platform_left = enemy_platform['x']
+            platform_right = enemy_platform['x'] + enemy_platform['w'] - 40
+            
+            if self.evil_tux_x <= platform_left:
+                self.evil_tux_x = platform_left
+                self.evil_tux_direction = 1
+            elif self.evil_tux_x >= platform_right:
+                self.evil_tux_x = platform_right
+                self.evil_tux_direction = -1
+            
+            self.evil_tux_y = enemy_platform['y'] - 60
+        
+        # Draw evil tux (flip based on direction)
+        if self.evil_tux_direction == 1:
+            evil_img = pygame.transform.flip(self.evil_tux_img, True, False)
+        else:
+            evil_img = self.evil_tux_img
+        screen.blit(evil_img, (int(self.evil_tux_x), int(self.evil_tux_y)))
+        
+        # Evil tux collision rect
+        evil_tux_rect = pygame.Rect(int(self.evil_tux_x), int(self.evil_tux_y), 40, 60)
+        
+        # Draw portal on the highest platform (top right)
+        portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
+        portal_y = platforms[-1]['y'] - 100
+        portal_rect = pygame.Rect(portal_x, portal_y, 80, 100)
+        screen.blit(self.portal_img, (portal_x, portal_y))
+
+        # Only update player if not dying
+        if not self.is_dying:
+            physics.apply_gravity(player, dt)
+            player.update(dt)
+            physics.handle_collisions(player, platform_rects + [left_wall, right_wall, ceiling], ice_platform_rects)
+            physics.apply_friction(player, dt)
+            
+            # Check water collision (death)
+            if physics.check_water_collision(player, water_hitbox):
+                self.is_dying = True
+                self.death_timer = 30
+            
+            # Check evil tux collision (death)
+            if player.rect.colliderect(evil_tux_rect):
+                self.is_dying = True
+                self.death_timer = 30
+            
+            # Check portal collision (level complete)
+            if player.rect.colliderect(portal_rect):
+                self.level_complete = True
+                # Reset enemy for next time
+                self.evil_tux_platform = None
+                
+
+        player.draw(screen)
+        
+        # Draw lives UI
+        self.draw_lives(screen, player)
+        
+        # Draw death message if dying
+        if self.is_dying:
+            if self.font is None:
+                self.font = pygame.font.Font(None, 72)
+            death_text = self.font.render("Ouch!", True, (255, 100, 100))
+            text_rect = death_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+            
+            # Draw semi-transparent background
+            bg_surface = pygame.Surface((text_rect.width + 40, text_rect.height + 20))
+            bg_surface.fill((0, 0, 0))
+            bg_surface.set_alpha(180)
+            screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
+            
+            # Draw text
+            screen.blit(death_text, text_rect)
+        
+        if self.level_complete:
+            if self.font is None:
+                self.font = pygame.font.Font(None, 72)
+            win_text = self.font.render("Level 3 Finished!", True, (100, 255, 100))
+            text_rect = win_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+            
+            # Draw semi-transparent background
+            bg_surface = pygame.Surface((text_rect.width + 40, text_rect.height + 20))
+            bg_surface.fill((0, 0, 0))
+            bg_surface.set_alpha(180)
+            screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
+            
+            # Draw text
+            screen.blit(win_text, text_rect)
+
+            self.feedback_timer += 1
+            if self.feedback_timer >= 90:
+                self.feedback_timer = 0
+                return "done"
 
     def level_4(self):
         pass
