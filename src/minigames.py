@@ -31,7 +31,7 @@ class IcePuzzle(Minigame):
         self.grid_cols = 20
         self.grid_rows = 5
         self.tile_size = 45
-        self.grid_x = (1000 - self.grid_cols * self.tile_size) // 2  # Center horizontally
+        self.grid_x = (1000 - self.grid_cols * self.tile_size) / 2  # Center horizontally
         self.grid_y = 180
         
         # Create the grid and path
@@ -139,8 +139,8 @@ class IcePuzzle(Minigame):
     def get_tile_at_pos(self, mouse_pos):
         """Get the grid position (col, row) at mouse position, or None"""
         mx, my = mouse_pos
-        col = (mx - self.grid_x) // self.tile_size
-        row = (my - self.grid_y) // self.tile_size
+        col = (mx - self.grid_x) / self.tile_size
+        row = (my - self.grid_y) / self.tile_size
         
         if 0 <= col < self.grid_cols and 0 <= row < self.grid_rows:
             return (col, row)
@@ -234,8 +234,8 @@ class IcePuzzle(Minigame):
                 # Add ice texture (simple lines)
                 if random.random() < 0.3:
                     crack_x = rect.x + random.randint(5, self.tile_size - 5)
-                    crack_y1 = rect.y + random.randint(5, self.tile_size // 2)
-                    crack_y2 = rect.y + random.randint(self.tile_size // 2, self.tile_size - 5)
+                    crack_y1 = rect.y + random.randint(5, self.tile_size / 2)
+                    crack_y2 = rect.y + random.randint(self.tile_size / 2, self.tile_size - 5)
                     pygame.draw.line(self.screen, (180, 210, 240), (crack_x, crack_y1), (crack_x, crack_y2), 1)
 
     def draw_player(self):
@@ -247,7 +247,7 @@ class IcePuzzle(Minigame):
             center_y = rect.centery + self.fall_offset
             
             # Shrinking circle as player falls
-            size = max(5, 15 - self.fall_offset // 10)
+            size = max(5, 15 - self.fall_offset / 10)
             alpha = max(0, 255 - self.fall_offset * 3)
             
             pygame.draw.circle(self.screen, (50, 100, 200), (center_x, center_y), size)
@@ -269,21 +269,21 @@ class IcePuzzle(Minigame):
         """Draw UI elements"""
         # Title
         title_text = self.font_medium.render("Find the Safe Path!", True, (0, 0, 0))
-        self.screen.blit(title_text, (500 - title_text.get_width() // 2, 20))
+        self.screen.blit(title_text, (500 - title_text.get_width() / 2, 20))
         
         # Instructions
         inst_text = self.font_small.render("Watch for the GREEN GLOW - it shows the safe path!", True, (50, 50, 50))
-        self.screen.blit(inst_text, (500 - inst_text.get_width() // 2, 70))
+        self.screen.blit(inst_text, (500 - inst_text.get_width() / 2, 70))
         
         # Hint indicator
         if self.hint_timer > 0:
             hint_text = self.font_small.render(">>> HINT ACTIVE <<<", True, (0, 180, 100))
-            self.screen.blit(hint_text, (500 - hint_text.get_width() // 2, 100))
+            self.screen.blit(hint_text, (500 - hint_text.get_width() / 2, 100))
         else:
             # Show countdown to next hint
             time_to_hint = (self.hint_interval + self.hint_timer) / 60
             countdown_text = self.font_small.render("Next hint in: %.1fs" % time_to_hint, True, (150, 150, 150))
-            self.screen.blit(countdown_text, (500 - countdown_text.get_width() // 2, 100))
+            self.screen.blit(countdown_text, (500 - countdown_text.get_width() / 2, 100))
         
         # Start and End markers
         start_rect = self.get_tile_rect(self.path[0][0], self.path[0][1])
@@ -292,8 +292,8 @@ class IcePuzzle(Minigame):
         start_text = self.font_small.render("START", True, (0, 150, 0))
         end_text = self.font_small.render("END", True, (200, 0, 0))
         
-        self.screen.blit(start_text, (start_rect.centerx - start_text.get_width() // 2, start_rect.y - 30))
-        self.screen.blit(end_text, (end_rect.centerx - end_text.get_width() // 2, end_rect.y - 30))
+        self.screen.blit(start_text, (start_rect.centerx - start_text.get_width() / 2, start_rect.y - 30))
+        self.screen.blit(end_text, (end_rect.centerx - end_text.get_width() / 2, end_rect.y - 30))
         
         # Attempts counter
         attempts_text = self.font_small.render("Attempts: %d" % self.attempts, True, (100, 100, 100))
@@ -309,10 +309,10 @@ class IcePuzzle(Minigame):
         if self.game_state == "falling":
             # Falling message
             fall_text = self.font_large.render("You fell through!", True, (200, 50, 50))
-            self.screen.blit(fall_text, (500 - fall_text.get_width() // 2, 480))
+            self.screen.blit(fall_text, (500 - fall_text.get_width() / 2, 480))
             
             restart_text = self.font_small.render("Restarting...", True, (150, 50, 50))
-            self.screen.blit(restart_text, (500 - restart_text.get_width() // 2, 540))
+            self.screen.blit(restart_text, (500 - restart_text.get_width() / 2, 540))
         
         elif self.game_state == "won":
             # Overlay
@@ -323,10 +323,10 @@ class IcePuzzle(Minigame):
             
             if self.win_timer > 20:
                 win_text = self.font_large.render("You Made It!", True, (100, 255, 150))
-                self.screen.blit(win_text, (500 - win_text.get_width() // 2, 250))
+                self.screen.blit(win_text, (500 - win_text.get_width() / 2, 250))
                 
                 stats_text = self.font_medium.render("Completed in %d attempts" % (self.attempts + 1), True, (200, 255, 220))
-                self.screen.blit(stats_text, (500 - stats_text.get_width() // 2, 330))
+                self.screen.blit(stats_text, (500 - stats_text.get_width() / 2, 330))
 
     def loop(self):
         clock = pygame.time.Clock()
@@ -500,8 +500,8 @@ class BlizzardSurvival(Minigame):
             
             # Update collision rectangle (slightly smaller for fairness)
             shrink = ball['size'] * 0.15
-            ball['rect'].x = ball['x'] - ball['size'] // 2 + shrink
-            ball['rect'].y = ball['y'] - ball['size'] // 2 + shrink
+            ball['rect'].x = ball['x'] - ball['size'] / 2 + shrink
+            ball['rect'].y = ball['y'] - ball['size'] / 2 + shrink
             ball['rect'].width = ball['size'] - shrink * 2
             ball['rect'].height = ball['size'] - shrink * 2
             
@@ -531,8 +531,15 @@ class BlizzardSurvival(Minigame):
     def draw_player(self):
         """Draw Tux character"""
         # Apply screen shake offset
-        shake_x = random.randint(-self.screen_shake, self.screen_shake) if self.screen_shake > 0 else 0
-        shake_y = random.randint(-self.screen_shake, self.screen_shake) if self.screen_shake > 0 else 0
+        if self.screen_shake > 0:
+            shake_x = random.randint(-self.screen_shake, self.screen_shake) 
+        else:
+            shake_x = 0
+
+        if self.screen_shake > 0:
+            shake_y = random.randint(-self.screen_shake, self.screen_shake) 
+        else:
+            shake_y = 0
         
         self.screen.blit(self.current_tux, (self.player_x + shake_x, self.player_y + shake_y))
 
@@ -544,16 +551,17 @@ class BlizzardSurvival(Minigame):
             center_y = int(ball['y'])
             
             # Outer glow
-            glow_color = tuple(min(255, c + 50) for c in ball['color'])
-            pygame.draw.circle(self.screen, glow_color, (center_x, center_y), ball['size'] // 2 + 3)
+            for c in ball['color']:
+                glow_color = tuple(min(255, c + 50))
+            pygame.draw.circle(self.screen, glow_color, (center_x, center_y), ball['size'] / 2 + 3)
             
             # Main ball
-            pygame.draw.circle(self.screen, ball['color'], (center_x, center_y), ball['size'] // 2)
+            pygame.draw.circle(self.screen, ball['color'], (center_x, center_y), ball['size'] / 2)
             
             # Highlight
-            highlight_x = center_x - ball['size'] // 6
-            highlight_y = center_y - ball['size'] // 6
-            highlight_size = ball['size'] // 5
+            highlight_x = center_x - ball['size'] / 6
+            highlight_y = center_y - ball['size'] / 6
+            highlight_size = ball['size'] / 5
             if highlight_size > 0:
                 pygame.draw.circle(self.screen, (255, 255, 255), (highlight_x, highlight_y), highlight_size)
 
@@ -562,10 +570,10 @@ class BlizzardSurvival(Minigame):
         # Time elapsed display at top
         time_elapsed = self.game_time / 60
         time_text = self.font_large.render("%.1fs" % time_elapsed, True, (255, 255, 255))
-        time_bg = pygame.Rect(500 - time_text.get_width() // 2 - 15, 10, time_text.get_width() + 30, 50)
+        time_bg = pygame.Rect(500 - time_text.get_width() / 2 - 15, 10, time_text.get_width() + 30, 50)
         pygame.draw.rect(self.screen, (0, 0, 0), time_bg, border_radius=10)
         pygame.draw.rect(self.screen, (255, 255, 255), time_bg, 3, border_radius=10)
-        self.screen.blit(time_text, (500 - time_text.get_width() // 2, 15))
+        self.screen.blit(time_text, (500 - time_text.get_width() / 2, 15))
         
         # Score
         score_text = self.font_medium.render("Score: %d" % self.score, True, (255, 255, 255))
@@ -579,9 +587,10 @@ class BlizzardSurvival(Minigame):
         # Instructions at bottom
         if self.game_time < 180:  # Show for first 3 seconds
             alpha = max(0, 255 - (self.game_time - 120) * 4) if self.game_time > 120 else 255
-            inst_text = self.font_small.render("Use LEFT/RIGHT arrows to dodge!", True, (255, 255, 255))
+            inst_text = self.font_small.render("Use LEFT/RIGHT arrows to dodge!" \
+            "Minimum of 20 seconds.", True, (255, 255, 255))
             inst_text.set_alpha(alpha)
-            self.screen.blit(inst_text, (500 - inst_text.get_width() // 2, 560))
+            self.screen.blit(inst_text, (500 - inst_text.get_width() / 2, 560))
 
     def draw_game_over(self):
         """Draw game over screen"""
@@ -595,17 +604,33 @@ class BlizzardSurvival(Minigame):
             title_text = self.font_large.render("GAME OVER!", True, (255, 100, 100))
             subtitle_text = self.font_medium.render("You got hit!", True, (255, 150, 150))
             
-            self.screen.blit(title_text, (500 - title_text.get_width() // 2, 180))
-            self.screen.blit(subtitle_text, (500 - subtitle_text.get_width() // 2, 260))
+            self.screen.blit(title_text, (500 - title_text.get_width() / 2, 180))
+            self.screen.blit(subtitle_text, (500 - subtitle_text.get_width() / 2, 260))
             
             # Stats
             score_text = self.font_medium.render("Final Score: %d" % self.score, True, (255, 255, 255))
             dodged_text = self.font_small.render("Balls Dodged: %d" % self.balls_dodged, True, (200, 200, 200))
             time_text = self.font_small.render("Time Survived: %.1fs" % (self.game_time / 60), True, (200, 200, 200))
             
-            self.screen.blit(score_text, (500 - score_text.get_width() // 2, 320))
-            self.screen.blit(dodged_text, (500 - dodged_text.get_width() // 2, 380))
-            self.screen.blit(time_text, (500 - time_text.get_width() // 2, 420))
+            self.screen.blit(score_text, (500 - score_text.get_width() / 2, 320))
+            self.screen.blit(dodged_text, (500 - dodged_text.get_width() / 2, 380))
+            self.screen.blit(time_text, (500 - time_text.get_width() / 2, 420))
+            
+            # Check if minimum requirement met (20 seconds)
+            time_survived = self.game_time / 60
+            if time_survived >= 20:
+                continue_text = self.font_small.render("Press SPACE to continue", True, (100, 255, 100))
+            else:
+                continue_text = self.font_small.render("Minimum 20 seconds required - Press R to restart", True, (255, 100, 100))
+            self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 480))
+            
+            # Check if minimum requirement met (20 seconds)
+            time_survived = self.game_time / 60
+            if time_survived >= 20:
+                continue_text = self.font_small.render("Press SPACE to continue", True, (100, 255, 100))
+            else:
+                continue_text = self.font_small.render("Minimum 20 seconds required - Press R to restart", True, (255, 100, 100))
+            self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 480))
 
     def loop(self):
         clock = pygame.time.Clock()
@@ -671,10 +696,6 @@ class BlizzardSurvival(Minigame):
                     self.screen_shake = 10
             else:
                 self.game_over_timer += 1
-                
-                # Auto-close after 4 seconds
-                if self.game_over_timer >= 240:
-                    keep_going = False
 
             # Draw everything
             # Sky gradient background
@@ -713,6 +734,26 @@ class BlizzardSurvival(Minigame):
                 if event.type == pygame.QUIT:
                     keep_going = False
                     break
+                elif event.type == pygame.KEYDOWN and self.game_over:
+                    time_survived = self.game_time / 60
+                    if time_survived >= 20:
+                        # Can continue if minimum met
+                        if event.key == pygame.K_SPACE:
+                            keep_going = False
+                            break
+                    else:
+                        # Must restart if minimum not met
+                        if event.key == pygame.K_r:
+                            # Reset game
+                            self.game_time = 0
+                            self.score = 0
+                            self.balls_dodged = 0
+                            self.falling_balls = []
+                            self.spawn_timer = 0
+                            self.game_over = False
+                            self.game_over_timer = 0
+                            self.player_x = 460
+                            self.player_velocity_x = 0
 
 class FishFrenzy(Minigame):
     def __init__(self):
@@ -734,6 +775,13 @@ class FishFrenzy(Minigame):
         # Score counter
         self.score = 0
         self.font = pygame.font.Font(None, 48)
+        self.font_large = pygame.font.Font(None, 72)
+        self.font_medium = pygame.font.Font(None, 56)
+        self.font_small = pygame.font.Font(None, 36)
+        
+        # Game state
+        self.game_complete = False
+        self.complete_timer = 0
 
         self.loop()
 
@@ -744,7 +792,7 @@ class FishFrenzy(Minigame):
         fish = {
             'x': random.randint(0, 920),
             'y': -80,  # Start above the screen
-            'speed': random.randint(3, 8),  # Random falling speed
+            'speed': random.randint(2, 5),  # Random falling speed
             'rotation': random.randint(0, 360),  # Random rotation
             'rect': pygame.Rect(0, 0, 250, 250)  # Collision rectangle
         }
@@ -760,6 +808,8 @@ class FishFrenzy(Minigame):
             # Remove fish that have fallen off the screen
             if fish['y'] > 600:
                 self.falling_fish.remove(fish)
+                # Fish escaped - game over
+                self.game_complete = True
 
     def draw_fish(self):
         """Draw all falling fish"""
@@ -775,6 +825,39 @@ class FishFrenzy(Minigame):
                 self.falling_fish.remove(fish)
                 self.score += 1
                 break
+    
+    def draw_complete_screen(self):
+        """Draw game complete screen"""
+        # Darken background
+        overlay = pygame.Surface((1000, 600))
+        overlay.set_alpha(min(200, self.complete_timer * 5))
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
+        
+        if self.complete_timer > 20:
+            # Check if player met minimum requirement
+            if self.score >= 25:
+                title_text = self.font_large.render("Success!", True, (100, 255, 100))
+                subtitle_text = self.font_medium.render("You caught enough fish!", True, (150, 255, 150))
+                title_color = (100, 255, 100)
+            else:
+                title_text = self.font_large.render("Game Over!", True, (255, 100, 100))
+                subtitle_text = self.font_medium.render("A fish escaped!", True, (255, 150, 150))
+                title_color = (255, 100, 100)
+            
+            self.screen.blit(title_text, (500 - title_text.get_width() / 2, 180))
+            self.screen.blit(subtitle_text, (500 - subtitle_text.get_width() / 2, 260))
+            
+            # Final score
+            score_text = self.font_medium.render("Final Score: %d / 25 minimum" % self.score, True, (255, 255, 255))
+            self.screen.blit(score_text, (500 - score_text.get_width() / 2, 340))
+            
+            # Continue or restart
+            if self.score >= 25:
+                continue_text = self.font_small.render("Press SPACE to continue", True, (200, 200, 200))
+            else:
+                continue_text = self.font_small.render("Minimum not met - Press R to restart", True, (255, 100, 100))
+            self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 450))
 
     def loop(self):
         clock = pygame.time.Clock()
@@ -782,15 +865,18 @@ class FishFrenzy(Minigame):
 
         while keep_going:
             clock.tick(60)
+            
+            if not self.game_complete:
+                # Spawn new fish periodically
+                self.spawn_timer += 1
+                if self.spawn_timer >= self.spawn_delay:
+                    self.spawn_fish()
+                    self.spawn_timer = 0
 
-            # Spawn new fish periodically
-            self.spawn_timer += 1
-            if self.spawn_timer >= self.spawn_delay:
-                self.spawn_fish()
-                self.spawn_timer = 0
-
-            # Update fish positions
-            self.update_fish()
+                # Update fish positions
+                self.update_fish()
+            else:
+                self.complete_timer += 1
 
             # Clear screen (sky blue background)
             self.screen.fill((135, 206, 235))
@@ -799,8 +885,21 @@ class FishFrenzy(Minigame):
             self.draw_fish()
             
             # Draw score
-            score_text = self.font.render("Score: %s" % self.score, True, (255, 255, 255))
+            if self.score >= 25:
+                score_color = (100, 255, 100)
+            else:
+                score_color = (255, 255, 255)
+            score_text = self.font.render("Score: %s (min: 25)" % self.score, True, score_color)
             self.screen.blit(score_text, (10, 10))
+            
+            # Draw minimum requirement reminder
+            if not self.game_complete:
+                reminder_text = self.font_small.render("Minimum 25 fish - Don't let any escape!", True, (100, 100, 100))
+                self.screen.blit(reminder_text, (500 - reminder_text.get_width() / 2, 560))
+            
+            # Draw game complete screen if applicable
+            if self.game_complete:
+                self.draw_complete_screen()
             
             pygame.display.flip()
 
@@ -808,7 +907,22 @@ class FishFrenzy(Minigame):
                 if event.type == pygame.QUIT:
                     keep_going = False
                     break
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.KEYDOWN and self.game_complete:
+                    if self.score >= 25:
+                        # Can continue if minimum met
+                        if event.key == pygame.K_SPACE:
+                            keep_going = False
+                            break
+                    else:
+                        # Must restart if minimum not met
+                        if event.key == pygame.K_r:
+                            # Reset game
+                            self.score = 0
+                            self.falling_fish = []
+                            self.spawn_timer = 0
+                            self.game_complete = False
+                            self.complete_timer = 0
+                elif event.type == pygame.MOUSEBUTTONDOWN and not self.game_complete:
                     if event.button == 1:  # Left mouse button
                         self.check_fish_click(event.pos)
 
@@ -856,7 +970,7 @@ class LogicTrial(Minigame):
     def draw_progress_bar(self):
         bar_width = 600
         bar_height = 30
-        bar_x = (1000 - bar_width) // 2
+        bar_x = (1000 - bar_width) / 2
         bar_y = 60
         
         pygame.draw.rect(self.screen, (50, 50, 50), (bar_x, bar_y, bar_width, bar_height), border_radius=10)
@@ -868,7 +982,7 @@ class LogicTrial(Minigame):
         
         # Progress text
         progress_text = self.small_font.render("Question %s" % (str(self.current_question+1) + " / " + str(len(self.questions))), True, self.text_color)
-        self.screen.blit(progress_text, (bar_x + bar_width // 2 - progress_text.get_width() // 2, bar_y + 35))
+        self.screen.blit(progress_text, (bar_x + bar_width / 2 - progress_text.get_width() / 2, bar_y + 35))
 
     def draw_question(self):
         if self.current_question >= len(self.questions):
@@ -876,10 +990,40 @@ class LogicTrial(Minigame):
 
         question, options, correct_index = self.questions[self.current_question]
 
-        # Draw question
-        question_surface = self.question_font.render(question, True, self.text_color)
-        question_rect = question_surface.get_rect(center=(500, 150))
-        self.screen.blit(question_surface, question_rect)
+        # Draw question with word wrapping
+        max_width = 900  # Maximum width for question text
+        words = question.split(' ')
+        lines = []
+        current_line = ""
+        
+        for word in words:
+            if current_line == "":
+                test_line = word
+            else:
+                test_line = current_line + " " + word
+                
+            test_surface = self.question_font.render(test_line, True, self.text_color)
+            if test_surface.get_width() <= max_width:
+                current_line = test_line
+            else:
+                if current_line != "":
+                    lines.append(current_line)
+                current_line = word
+        
+        if current_line != "":
+            lines.append(current_line)
+        
+        # Draw each line
+        if len(lines) > 1:
+            start_y = 150 
+        else:
+            start_y = 170
+            
+        for i in range(len(lines)):
+            line = lines[i]
+            line_surface = self.question_font.render(line, True, self.text_color)
+            line_rect = line_surface.get_rect(center=(500, start_y + i * 35))
+            self.screen.blit(line_surface, line_rect)
 
         i = 0
         for option in options:
@@ -904,7 +1048,7 @@ class LogicTrial(Minigame):
         )
         self.screen.blit(
             instruction_text,
-            (500 - instruction_text.get_width() // 2, 550)
+            (500 - instruction_text.get_width() / 2, 550)
         )
 
 
@@ -922,10 +1066,10 @@ class LogicTrial(Minigame):
     def draw_results(self):
         # Final score screen
         title = self.title_font.render("Quiz Complete!", True, self.text_color)
-        self.screen.blit(title, (500 - title.get_width() // 2, 150))
+        self.screen.blit(title, (500 - title.get_width() / 2, 150))
         
         score_text = self.question_font.render("Your Score: %s" % (str(self.score) + " / " + str(len(self.questions))), True, self.text_color)
-        self.screen.blit(score_text, (500 - score_text.get_width() // 2, 250))
+        self.screen.blit(score_text, (500 - score_text.get_width() / 2, 250))
         
         percentage = (self.score / len(self.questions)) * 100
         if percentage >= 80:
@@ -939,21 +1083,21 @@ class LogicTrial(Minigame):
             grade_color = self.wrong_color
         
         grade_text = self.title_font.render(grade, True, grade_color)
-        self.screen.blit(grade_text, (500 - grade_text.get_width() // 2, 330))
+        self.screen.blit(grade_text, (500 - grade_text.get_width() / 2, 330))
         
         if percentage <= 50:
             continue_text = self.small_font.render("Press R to restart the quiz", True, (200, 200, 200))
         else:
             continue_text = self.small_font.render("Press SPACE to continue", True, (200, 200, 200))
-        self.screen.blit(continue_text, (500 - continue_text.get_width() // 2, 450))
+        self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 450))
 
     def handle_answer(self, answer_index):
         if self.game_state != "playing":
             return
             
-        correct = self.questions[self.current_question]
+        _, _, correct_answer = self.questions[self.current_question]
         
-        if answer_index == correct:
+        if answer_index == correct_answer:
             self.score += 1
             self.game_state = "correct"
         else:
@@ -1012,7 +1156,7 @@ class LogicTrial(Minigame):
             
             # Title
             title = self.title_font.render("Logic Trial - Animal Quiz", True, self.text_color)
-            self.screen.blit(title, (500 - title.get_width() // 2, 10))
+            self.screen.blit(title, (500 - title.get_width() / 2, 10))
             
             self.draw_progress_bar()
             
@@ -1024,3 +1168,5 @@ class LogicTrial(Minigame):
                 self.draw_question()
             
             pygame.display.flip()
+
+BlizzardSurvival()

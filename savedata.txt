@@ -51,4 +51,21 @@ logic_trial_best_score = 0
 achievements = 
 total_deaths = 0
 total_playtime = 0.00
+[USER:justin]
+username = justin
+password = 123456789
+player_name = 
+levels_reached = 1
+highest_level_completed = 0
+fish_collected = 0
+total_fish_ever = 0
+double_jump_unlocked = False
+intelligence_boost_unlocked = False
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 0
+total_playtime = 0.00
 
