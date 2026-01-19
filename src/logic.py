@@ -204,7 +204,7 @@ class LevelManager:
                 (heart_x + 8, 18)
             ])
 
-    def level_1(self, screen, physics, player, game_bg, clock):
+    def level_1(self, screen, physics, player, game_bg, clock, save_data=None):
         # Handle death animation
         if self.is_dying:
             self.death_timer -= 1
@@ -215,6 +215,9 @@ class LevelManager:
                     # Reset lives and restart
                     player.reset_lives()
                 player.reset_position()
+                # Track death in save data
+                if save_data:
+                    save_data.add_death()
         
         # Use pre-loaded images
         water_img = self.water_img

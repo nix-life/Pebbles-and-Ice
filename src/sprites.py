@@ -210,14 +210,23 @@ class Environment(Sprites):
                 
                 # Handle returning player decision
                 if result == "returning":
-                    """Yes - Open level selection"""
-                    self.level_selection_loop()
-                    return
+                    """Yes - Login required"""
+                    if self.loading.login_screen(self.screen, self.load_data):
+                        self.level_selection_loop()
+                        return
+                    else:
+                        clicked_button = False
+                        self.current_bg = self.before
                 elif result == "new":
-                    """No - Open tutorial first"""
-                    self.tut.load_tutorial(self.screen)
-                    self.level_selection_loop()
-                    return
+                    """No - Create account and open tutorial"""
+                    if self.loading.register_screen(self.screen, self.load_data):
+                        self.tut.load_tutorial(self.screen)
+                        self.level_selection_loop()
+                        return
+                    else:
+                        # Registration failed, restart
+                        clicked_button = False
+                        self.current_bg = self.before
 
             pygame.display.flip()
 
@@ -234,7 +243,7 @@ class Environment(Sprites):
             result = self.game_control.update_game(self.screen, self.events)
             if result == "start_game":
                 from main import GameLevel
-                GameLevel()
+                GameLevel(save_data=self.load_data)
                 return
             pygame.display.flip()
 

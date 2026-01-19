@@ -1,6 +1,6 @@
+from platform import uname
 import pygame
 import logic 
-import os
 
 class Data:
     def __init__(self):
@@ -16,7 +16,6 @@ class PlayerStats(Data):
     def unlock_ability(self, level):
         if level >= 2:
             self.double_jump_unlocked = True
-            print("Double Jump ability unlocked!")
         elif level > 3:
             pass
 
@@ -25,6 +24,103 @@ class PlayerStats(Data):
 
     def add_fish(self):
         pass
+    
+    def get_text_input(self, screen, prompt):
+        """Simple text input screen"""
+        input_text = ""
+        font = pygame.font.SysFont("verdana", 36)
+        title_font = pygame.font.SysFont("verdana", 48, bold=True)
+        
+        while True:
+            screen.fill((50, 80, 120))
+            
+            # Draw prompt
+            title = title_font.render(prompt, True, (255, 255, 255))
+            screen.blit(title, (500 - title.get_width() // 2, 150))
+            
+            # Draw input box
+            input_box = pygame.Rect(250, 300, 500, 60)
+            pygame.draw.rect(screen, (255, 255, 255), input_box)
+            pygame.draw.rect(screen, (0, 0, 0), input_box, 3)
+            
+            text_surface = font.render(input_text, True, (0, 0, 0))
+            screen.blit(text_surface, (input_box.x + 10, input_box.y + 15))
+            
+            # Instructions
+            inst_font = pygame.font.SysFont("verdana", 24)
+            inst = inst_font.render("Press ENTER to continue, ESC to cancel", True, (200, 200, 200))
+            screen.blit(inst, (500 - inst.get_width() // 2, 450))
+            
+            pygame.display.flip()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return None
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        return input_text
+                    elif event.key == pygame.K_ESCAPE:
+                        return None
+                    elif event.key == pygame.K_BACKSPACE:
+                        input_text = input_text[:-1]
+                    else:
+                        input_text += event.unicode
+    
+    def login_screen(self, screen, save_data):
+        """Screen for returning players to login"""
+        username = self.get_text_input(screen, "Enter Username:")
+        if username is None:
+            return False
+        
+        password = self.get_text_input(screen, "Enter Password:")
+        if password is None:
+            return False
+        
+        # Verify credentials
+        if save_data.verify_login(username, password):
+            screen.fill((50, 80, 120))
+            font = pygame.font.SysFont("verdana", 48, bold=True)
+            success = font.render("Login Successful!", True, (100, 255, 100))
+            screen.blit(success, (500 - success.get_width() / 2, 250))
+            pygame.display.flip()
+            pygame.time.wait(1500)
+            return True
+        else:
+            screen.fill((50, 80, 120))
+            font = pygame.font.SysFont("verdana", 48, bold=True)
+            fail = font.render("Invalid Credentials!", True, (255, 100, 100))
+            screen.blit(fail, (500 - fail.get_width() / 2, 250))
+            pygame.display.flip()
+            pygame.time.wait(1500)
+            return False
+    
+    def register_screen(self, screen, save_data):
+        """Screen for new players to create account"""
+        username = self.get_text_input(screen, "Create Username:")
+        if username is None or username == "":
+            return False
+        
+        password = self.get_text_input(screen, "Create Password:")
+        if password is None or password == "":
+            return False
+    
+        # Create account
+        if save_data.create_account(username, password):
+            screen.fill((50, 80, 120))
+            font = pygame.font.SysFont("verdana", 48, bold=True)
+            success = font.render("Account Created!", True, (100, 255, 100))
+            screen.blit(success, (500 - success.get_width() / 2, 250))
+            pygame.display.flip()
+            pygame.time.wait(1500)
+            return True
+        else:
+            screen.fill((50, 80, 120))
+            font = pygame.font.SysFont("verdana", 48, bold=True)
+            error = font.render("Username already exists!", True, (255, 100, 100))
+            screen.blit(error, (500 - error.get_width() / 2, 250))
+            pygame.display.flip()
+            pygame.time.wait(1500)
+            return False
 
     def update_level(self, screen, events):
         small_font = pygame.font.SysFont("verdana", 48, bold=True)
@@ -73,6 +169,8 @@ class SaveData(Data):
         self.game_controller = logic.GameController()
         
         # Default save data
+        self.username = ""
+        self.password = ""
         self.player_name = ""
         self.levels_reached = 1
         self.highest_level_completed = 0
@@ -88,21 +186,35 @@ class SaveData(Data):
         self.total_deaths = 0
         self.total_playtime = 0.0
 
-    def load_game(self):
-        f = None
+    def load_game(self, username):
+        savefile = None
         try:
-            f = open(self.SAVE_FILE, "r")
-            lines = f.readlines()
-            f.close()
+            savefile = open(self.SAVE_FILE, "r")
+            lines = savefile.readlines()
+            savefile.close()
             
+            # Find the user's section
+            in_user_section = False
             for line in lines:
                 line = line.strip()
-                if "=" in line:
+                
+                # Check for user section marker
+                if len(line) > 7 and line[:6] == "[USER:" and line[-1] == "]":
+                    current_user = line[6:-1]  # Extract username from [USER:username]
+                    in_user_section = (current_user == username)
+                    continue
+                
+                # Only process lines in this user's section
+                if in_user_section and "=" in line:
                     key, value = line.split("=", 1)
                     key = key.strip()
                     value = value.strip()
                     
-                    if key == "player_name":
+                    if key == "username":
+                        self.username = value
+                    elif key == "password":
+                        self.password = value
+                    elif key == "player_name":
                         self.player_name = value
                     elif key == "levels_reached":
                         self.levels_reached = int(value)
@@ -131,46 +243,102 @@ class SaveData(Data):
                     elif key == "total_playtime":
                         self.total_playtime = float(value)
             
-            print("Game loaded successfully!")
-            return True
+            return self.username == username
         except:
-            if f:
-                f.close()
-            print("Error loading save file")
+            if savefile:
+                savefile.close()
             return False
 
     def save_game(self):
-        """Save current game data to file"""
-        f = None
+        """Save current game data to file (update or append)"""
+        # Read all existing data
+        all_users_data = {}
+        savefile = None
+
         try:
-            f = open(self.SAVE_FILE, "w")
-            f.write("player_name = %s\n" % self.player_name)
-            f.write("levels_reached = %d\n" % self.levels_reached)
-            f.write("highest_level_completed = %d\n" % self.highest_level_completed)
-            f.write("fish_collected = %d\n" % self.fish_collected)
-            f.write("total_fish_ever = %d\n" % self.total_fish_ever)
-            f.write("double_jump_unlocked = %s\n" % self.double_jump_unlocked)
-            f.write("intelligence_boost_unlocked = %s\n" % self.intelligence_boost_unlocked)
-            f.write("blizzard_survival_best_time = %.2f\n" % self.blizzard_survival_best_time)
-            f.write("ice_puzzle_best_attempts = %d\n" % self.ice_puzzle_best_attempts)
-            f.write("fish_frenzy_high_score = %d\n" % self.fish_frenzy_high_score)
-            f.write("logic_trial_best_score = %d\n" % self.logic_trial_best_score)
-            f.write("achievements = %s\n" % self.achievements)
-            f.write("total_deaths = %d\n" % self.total_deaths)
-            f.write("total_playtime = %.2f\n" % self.total_playtime)
-            f.close()
-            print("Game saved successfully!")
+            savefile = open(self.SAVE_FILE, "r")
+            lines = savefile.readlines()
+            savefile.close()
+            
+            current_user = None
+            user_lines = []
+            
+            for line in lines:
+                stripped = line.strip()
+                # Skip empty lines
+                if len(stripped) == 0:
+                    continue
+                    
+                if len(stripped) > 7 and stripped[:6] == "[USER:" and stripped[-1] == "]":
+                    # Save previous user's data
+                    if current_user:
+                        all_users_data[current_user] = user_lines
+                    current_user = stripped[6:-1]
+                    user_lines = []
+                else:
+                    user_lines.append(line)
+            
+            # Save last user's data
+            if current_user:
+                all_users_data[current_user] = user_lines
+
+        except:
+            if savefile:
+                savefile.close()
+
+        current_user_data = []
+        current_user_data.append("username = %s\n" % self.username)
+        current_user_data.append("password = %s\n" % self.password)
+        current_user_data.append("player_name = %s\n" % self.player_name)
+        current_user_data.append("levels_reached = %d\n" % self.levels_reached)
+        current_user_data.append("highest_level_completed = %d\n" % self.highest_level_completed)
+        current_user_data.append("fish_collected = %d\n" % self.fish_collected)
+        current_user_data.append("total_fish_ever = %d\n" % self.total_fish_ever)
+        current_user_data.append("double_jump_unlocked = %s\n" % self.double_jump_unlocked)
+        current_user_data.append("intelligence_boost_unlocked = %s\n" % self.intelligence_boost_unlocked)
+        current_user_data.append("blizzard_survival_best_time = %.2f\n" % self.blizzard_survival_best_time)
+        current_user_data.append("ice_puzzle_best_attempts = %d\n" % self.ice_puzzle_best_attempts)
+        current_user_data.append("fish_frenzy_high_score = %d\n" % self.fish_frenzy_high_score)
+        current_user_data.append("logic_trial_best_score = %d\n" % self.logic_trial_best_score)
+        current_user_data.append("achievements = %s\n" % self.achievements)
+        current_user_data.append("total_deaths = %d\n" % self.total_deaths)
+        current_user_data.append("total_playtime = %.2f\n" % self.total_playtime)
+        
+        all_users_data[self.username] = current_user_data
+
+        # Write all users back to file
+        savefile = None
+        try:
+            savefile = open(self.SAVE_FILE, "w")
+            for username in all_users_data:
+                savefile.write("[USER:%s]\n" % username)
+                for line in all_users_data[username]:
+                    savefile.write(line)
+                savefile.write("\n")
+            savefile.close()
             return True
         except:
-            if f:
-                f.close()
-            print("Error saving game")
+            if savefile:
+                savefile.close()
             return False
 
-    # Setters for updating save data
-    def set_player_name(self, name):
-        self.player_name = name
+    def verify_login(self, username, password):
+        """Check if username and password match saved data"""
+        if self.load_game(username):
+            return self.username == username and self.password == password
+        return False
 
+    
+    def create_account(self, username, password):
+        """Create new account with username and password"""
+        if self.load_game(username):
+            return False
+        
+        self.username = username
+        self.password = password
+        return self.save_game()
+    
+    # Setters for updating save data
     def set_level_reached(self, level):
         if level > self.levels_reached:
             self.levels_reached = level
@@ -243,11 +411,6 @@ class SaveData(Data):
             "logic_trial_best_score": self.logic_trial_best_score
         }
 
-    def get_achievements(self):
-        if self.achievements == "":
-            return []
-        return self.achievements.split(",")
-
     def leaderboard(self):
         """Return formatted leaderboard data"""
         return {
@@ -304,6 +467,7 @@ class TutorialData(Data):
                 "You are a penguin named Tux.",
                 "Your goal is to bring a pebble to your friend Domino.",
                 "Collect fish to score high on the leaderboard!",
+                "Click \"s\" to save your progress anytime.",
                 "",
                 "Press any key or click to continue..."
             ]
