@@ -461,13 +461,12 @@ class TutorialData(Data):
             
             tutorial_lines = [
                 "CONTROLS:",
-                "A/D - Move left/right     W/SPACE - Jump",
+                "A/D - Move left/right     W/SPACE - Jump     S - Save Game",
                 "",
                 "STORY:",
                 "You are a penguin named Tux.",
                 "Your goal is to bring a pebble to your friend Domino.",
                 "Collect fish to score high on the leaderboard!",
-                "Click \"s\" to save your progress anytime.",
                 "",
                 "Press any key or click to continue..."
             ]

@@ -8,11 +8,6 @@
 	- Trigger minigames and give hints via NPCs.
 	- Add visual and audio feedback for dialogue.
 
-4. Save/Load, User System, Leaderboard
-	- Implement save/load system for player progress, abilities, and fish count.
-	- Add user authentication (username/password).
-	- Create a leaderboard to track high scores/fish.
-
 6. Enemies and Hazards
 	- Implement Evil Tux enemy logic and movement.
 	- Add hazards (water, spikes, moving platforms, etc.).
@@ -22,12 +17,8 @@
 	- Implement intelligence and double jump power-ups.
 	- Add UI/visual feedback for unlocked abilities.
 
-9. Domino and Pebble
-	- Draw and add Domino NPC and pebble object.
-	- Implement end-game sequence with Domino.
-
 10. UI and Feedback
-	 - Add health bar, fish counter, and ability indicators.
+	 - Add fish counter, and ability indicators.
 	 - Implement sound effects and background music.
 	 - Add achievement system and notifications.
 

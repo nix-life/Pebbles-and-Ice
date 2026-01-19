@@ -4,6 +4,7 @@ Not just any stone will do. Domino wants one shaped by ice and time.
 Look where the ground shifts and the path isn’t obvious.
 Think smart, Tux. Ice favors the clever.”
 
+(Initiate Logic Trial)
 
 OWL
 “Hoo… every step matters on this frozen path.
@@ -11,7 +12,7 @@ Ice will carry you farther than you expect, while snow will hold you back.
 Observe before you move, and you will not fall.
 The pebble you seek lies beyond patience, not speed.”
 
-(Initiate Logic Trial)
+(Initiate Ice Puzzle)
 
 
 
@@ -29,7 +30,7 @@ A penguin who plans well earns enough to finish the journey.”
 RABBIT
 “Hey! You can’t reach everything with one jump!
 Learn the double jump, and you’ll leap again while still in the air.
-Some platforms—and some pebbles—are impossible without it.
+Some platforms and some pebbles are impossible without it.
 Try it out. You’ll feel lighter already!”
 
 (Initiates Dodging Game (Unlocks Double Jump))

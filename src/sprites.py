@@ -252,7 +252,7 @@ class Environment(Sprites):
             result = self.game_control.update_game(self.screen, self.events, self.load_data)
             if result == "start_game":
                 from main import GameLevel
-                GameLevel(save_data=self.load_data)
+                GameLevel(save_data=self.load_data, start_level=self.game_control.level)
                 return
             pygame.display.flip()
 

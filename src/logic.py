@@ -20,9 +20,15 @@ class GameController:
         small_font = pygame.font.SysFont("verdana", 48, bold=True)
         title_font = pygame.font.SysFont("Helvetica", 72, bold=True)
         button_font = pygame.font.SysFont("verdana", 24, bold=True)
+        lock_font = pygame.font.SysFont("verdana", 60, bold=True)
         text_surface = title_font.render("LEVELS", True, (0, 0, 160))
         text_rect = text_surface.get_rect(center=(500, 100))
         screen.blit(text_surface, text_rect)
+
+        # Determine highest unlocked level
+        max_unlocked = 1
+        if save_data:
+            max_unlocked = save_data.highest_level_completed + 1
 
         for i in range(3):
             x = 120 + i * 325
@@ -31,11 +37,23 @@ class GameController:
             box_rect = pygame.Rect(x, y, 125, 125)
             self.boxes[level_num] = box_rect  
             
+            # Check if level is locked
+            is_locked = level_num > max_unlocked
+            
             pygame.draw.rect(screen, (150, 150, 150), (x-10, y-10, 145, 145), border_radius=10)
-            pygame.draw.rect(screen, (137, 207, 240), box_rect, border_radius=10)
-            text_surface = small_font.render(str(level_num), True, (0, 0, 0))
-            text_rect = text_surface.get_rect(center=(x + 62, y + 62))
-            screen.blit(text_surface, text_rect)
+            if is_locked:
+                # Draw locked level in gray
+                pygame.draw.rect(screen, (100, 100, 100), box_rect, border_radius=10)
+                # Draw lock icon
+                lock_text = lock_font.render("🔒", True, (50, 50, 50))
+                lock_rect = lock_text.get_rect(center=(x + 62, y + 62))
+                screen.blit(lock_text, lock_rect)
+            else:
+                # Draw unlocked level
+                pygame.draw.rect(screen, (137, 207, 240), box_rect, border_radius=10)
+                text_surface = small_font.render(str(level_num), True, (0, 0, 0))
+                text_rect = text_surface.get_rect(center=(x + 62, y + 62))
+                screen.blit(text_surface, text_rect)
 
         for i in range(2):
             x = 270 + i * 325
@@ -44,11 +62,23 @@ class GameController:
             box_rect = pygame.Rect(x, y, 125, 125)
             self.boxes[level_num] = box_rect 
             
+            # Check if level is locked
+            is_locked = level_num > max_unlocked
+            
             pygame.draw.rect(screen, (150, 150, 150), (x-10, y-10, 145, 145), border_radius=10)
-            pygame.draw.rect(screen, (137, 207, 240), box_rect, border_radius=10)
-            text_surface = small_font.render(str(level_num), True, (0, 0, 0))
-            text_rect = text_surface.get_rect(center=(x + 62, y + 62))
-            screen.blit(text_surface, text_rect)
+            if is_locked:
+                # Draw locked level in gray
+                pygame.draw.rect(screen, (100, 100, 100), box_rect, border_radius=10)
+                # Draw lock icon
+                lock_text = lock_font.render("🔒", True, (50, 50, 50))
+                lock_rect = lock_text.get_rect(center=(x + 62, y + 62))
+                screen.blit(lock_text, lock_rect)
+            else:
+                # Draw unlocked level
+                pygame.draw.rect(screen, (137, 207, 240), box_rect, border_radius=10)
+                text_surface = small_font.render(str(level_num), True, (0, 0, 0))
+                text_rect = text_surface.get_rect(center=(x + 62, y + 62))
+                screen.blit(text_surface, text_rect)
         
         # Draw View Stats button in bottom right
         self.view_stats_button = pygame.Rect(820, 520, 160, 60)
@@ -64,20 +94,37 @@ class GameController:
                     if save_data:
                         self.display_stats_screen(screen, save_data)
                 elif self.boxes[1].collidepoint(event.pos):
+                    # Level 1 is always unlocked
                     self.level = 1
                     return "start_game"
-                elif self.boxes[2].collidepoint(event.pos): 
-                    self.level = 2
-                    print("Level 2 selected")
+                elif self.boxes[2].collidepoint(event.pos):
+                    if save_data and save_data.highest_level_completed >= 1:
+                        self.level = 2
+                        print("Level 2 selected")
+                        return "start_game"
+                    else:
+                        print("Level 2 is locked - complete Level 1 first")
                 elif self.boxes[3].collidepoint(event.pos):
-                    self.level = 3
-                    print("Level 3 selected")
+                    if save_data and save_data.highest_level_completed >= 2:
+                        self.level = 3
+                        print("Level 3 selected")
+                        return "start_game"
+                    else:
+                        print("Level 3 is locked - complete Level 2 first")
                 elif self.boxes[4].collidepoint(event.pos):
-                    self.level = 4
-                    print("Level 4 selected")
+                    if save_data and save_data.highest_level_completed >= 3:
+                        self.level = 4
+                        print("Level 4 selected")
+                        return "start_game"
+                    else:
+                        print("Level 4 is locked - complete Level 3 first")
                 elif self.boxes[5].collidepoint(event.pos):
-                    self.level = 5
-                    print("Level 5 selected")
+                    if save_data and save_data.highest_level_completed >= 4:
+                        self.level = 5
+                        print("Level 5 selected")
+                        return "start_game"
+                    else:
+                        print("Level 5 is locked - complete Level 4 first")
                     
     def display_stats_screen(self, screen, save_data):
         """Display player statistics in a popup overlay"""

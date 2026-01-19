@@ -4,7 +4,7 @@ from logic import Physics, LevelManager
 from data import SaveData
 
 class GameLevel:
-    def __init__(self, save_data=None):
+    def __init__(self, save_data=None, start_level=1):
         pygame.init()
         self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Pebbles and Ice")
@@ -12,12 +12,17 @@ class GameLevel:
         self.player = Player(120, self.screen.get_height() - 200)
         self.physics = Physics()
         self.level_manager = LevelManager()
-        self.save_data = save_data if save_data else SaveData()
+        if save_data:
+            self.save_data = save_data 
+        else:
+            self.save_data = SaveData()
         self.game_bg = pygame.image.load("images/game-background.png")
         self.game_bg = pygame.transform.smoothscale(self.game_bg, (1000, 600))
         self.clock = pygame.time.Clock()
         
-        self.current_state = "level_1"  # Track game state
+        # Set starting level based on selection
+        self.current_state = "level_%d" % start_level
+        self.level_manager.current_level = start_level
         self.save_message_timer = 0
 
         self.loop()
