@@ -551,8 +551,7 @@ class BlizzardSurvival(Minigame):
             center_y = int(ball['y'])
             
             # Outer glow
-            for c in ball['color']:
-                glow_color = tuple(min(255, c + 50))
+            glow_color = tuple(min(255, c + 50) for c in ball['color'])
             pygame.draw.circle(self.screen, glow_color, (center_x, center_y), ball['size'] / 2 + 3)
             
             # Main ball
@@ -1168,3 +1167,4 @@ class LogicTrial(Minigame):
                 self.draw_question()
             
             pygame.display.flip()
+BlizzardSurvival()

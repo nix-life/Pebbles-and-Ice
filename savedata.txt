@@ -32,7 +32,7 @@ fish_frenzy_high_score = 0
 logic_trial_best_score = 0
 achievements = 
 total_deaths = 2
-total_playtime = 46.01
+total_playtime = 93.07
 
 [USER:h]
 username = h
