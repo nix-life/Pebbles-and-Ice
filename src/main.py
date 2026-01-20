@@ -13,7 +13,7 @@ import pygame
 from sprites import Player, Environment
 from logic import Physics, LevelManager
 from data import SaveData
-from minigames import IcePuzzle, LogicTrial, FishFrenzy, BlizzardSurvival
+from minigames import IcePuzzle, BlizzardSurvival, FishFrenzy, LogicTrial
 
 class GameLevel:
     """
@@ -59,8 +59,8 @@ class GameLevel:
         # Start the game loop immediately after setup
         self.loop()
 
-        # Cleanly shut down pygame when loop exits
-        pygame.quit()
+        # Don't quit pygame here - let the caller handle it
+        # pygame.quit() is called when the main Environment exits
 
     def event_handling(self):
         """Process input events and update player movement intent."""
@@ -119,24 +119,15 @@ class GameLevel:
                 level1 = self.level_manager.level_1(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
                 if level1 == "done":
-                    # Advance state machine to the next level
-                    self.current_state = "level_2"
-                    self.level_manager.current_level = 2
-                    # Reset per-level flags in LevelManager
-                    self.level_manager.level_complete = False
-                    self.level_manager.level_complete_sound_played = False
-                    
                     # Update save data
                     self.save_data.complete_level(1)
                     self.save_data.set_level_reached(2)
                     
-                    # Set spawn position for level 2 before reset
-                    self.player.spawn_x = 80
-                    self.player.spawn_y = 350
+                    # Play minigame after level 1
+                    IcePuzzle(self.screen)
                     
-                    # Reset player for next level
-                    self.player.reset_position()
-                    self.player.reset_lives()
+                    # Return to home screen after minigame
+                    return
                 
             
             elif self.current_state == "level_2":
@@ -146,62 +137,34 @@ class GameLevel:
                 
                 level2 = self.level_manager.level_2(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level2 == "minigame_ice":
-                    # Save player position before minigame
-                    saved_x = self.player.rect.x
-                    saved_y = self.player.rect.y
-                    IcePuzzle()
-                    # Restore player position after minigame
-                    self.player.rect.x = saved_x
-                    self.player.rect.y = saved_y
-                    self.player.vel.x = 0
-                    self.player.vel.y = 0
-                elif level2 == "done":
-                    # Advance state machine to the next level
-                    self.current_state = "level_3"
-                    self.level_manager.current_level = 3
-                    self.level_manager.level_complete = False
-                    self.level_manager.level_complete_sound_played = False
-                    
+                if level2 == "done":
                     # Update save data
                     self.save_data.complete_level(2)
                     self.save_data.set_level_reached(3)
                     
-                    # Reset player for next level
-                    self.player.reset_position()
-                    self.player.reset_lives()
+                    # Play minigame after level 2
+                    BlizzardSurvival(self.screen)
+                    
+                    # Return to home screen after minigame
+                    return
 
             elif self.current_state == "level_3":
+                # Set spawn position for level 3
+                self.player.spawn_x = 50
+                self.player.spawn_y = 460
+                
                 level3 = self.level_manager.level_3(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level3 == "minigame_logic":
-                    # Save player position before minigame
-                    saved_x = self.player.rect.x
-                    saved_y = self.player.rect.y
-                    LogicTrial()
-                    # Restore player position after minigame
-                    self.player.rect.x = saved_x
-                    self.player.rect.y = saved_y
-                    self.player.vel.x = 0
-                    self.player.vel.y = 0
-                elif level3 == "done":
-                    # Advance state machine to the next level
-                    self.current_state = "level_4"
-                    self.level_manager.current_level = 4
-                    self.level_manager.level_complete = False
-                    self.level_manager.level_complete_sound_played = False
-                    
+                if level3 == "done":
                     # Update save data
                     self.save_data.complete_level(3)
                     self.save_data.set_level_reached(4)
                     
-                    # Set spawn position for level 4
-                    self.player.spawn_x = 40
-                    self.player.spawn_y = 400
+                    # Play minigame after level 3
+                    FishFrenzy(self.screen)
                     
-                    # Reset player for next level
-                    self.player.reset_position()
-                    self.player.reset_lives()
+                    # Return to home screen after minigame
+                    return
 
             elif self.current_state =="level_4":
                 # Set spawn position for level 4
@@ -210,34 +173,16 @@ class GameLevel:
                 
                 level4 = self.level_manager.level_4(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level4 == "minigame_fish":
-                    # Save player position before minigame
-                    saved_x = self.player.rect.x
-                    saved_y = self.player.rect.y
-                    FishFrenzy()
-                    # Restore player position after minigame
-                    self.player.rect.x = saved_x
-                    self.player.rect.y = saved_y
-                    self.player.vel.x = 0
-                    self.player.vel.y = 0
-                elif level4 == "done":
-                    # Advance state machine to the next level
-                    self.current_state = "level_5"
-                    self.level_manager.current_level = 5
-                    self.level_manager.level_complete = False
-                    self.level_manager.level_complete_sound_played = False
-                    
+                if level4 == "done":
                     # Update save data
                     self.save_data.complete_level(4)
                     self.save_data.set_level_reached(5)
                     
-                    # Set spawn position for level 5
-                    self.player.spawn_x = 35
-                    self.player.spawn_y = 420
+                    # Play minigame after level 4
+                    LogicTrial(self.screen)
                     
-                    # Reset player for next level
-                    self.player.reset_position()
-                    self.player.reset_lives()
+                    # Return to home screen after minigame
+                    return
 
             elif self.current_state =="level_5":
                 # Set spawn position for level 5
@@ -246,17 +191,7 @@ class GameLevel:
                 
                 level5 = self.level_manager.level_5(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level5 == "minigame_blizzard":
-                    # Save player position before minigame
-                    saved_x = self.player.rect.x
-                    saved_y = self.player.rect.y
-                    BlizzardSurvival()
-                    # Restore player position after minigame
-                    self.player.rect.x = saved_x
-                    self.player.rect.y = saved_y
-                    self.player.vel.x = 0
-                    self.player.vel.y = 0
-                elif level5 == "done":
+                if level5 == "done":
                     # Mark final completion and switch to final scene
                     self.save_data.complete_level(5)
                     self.current_state = "final_scene"
@@ -278,7 +213,7 @@ class GameLevel:
                 # Load domino image if not loaded
                 if self.domino_img is None:
                     self.domino_img = pygame.image.load("images/domino.png")
-                    self.domino_img = pygame.transform.smoothscale(self.domino_img, (100, 100))
+                    self.domino_img = pygame.transform.smoothscale(self.domino_img, (60, 80))
                 
                 # Create floor platform (entire width)
                 if self.final_scene_floor is None:
@@ -326,7 +261,7 @@ class GameLevel:
                         dialogue_lines = [
                             "Domino: You made it, my friend!",
                             "The perfect pebble, shaped by ice and time.",
-                            "No matter how far the ice stretches, you'll always be my friend."
+                            "Thank you for this precious gift!"
                         ]
                         
                         # Draw dialogue box

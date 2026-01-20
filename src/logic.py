@@ -350,6 +350,34 @@ class LevelManager:
         self.rabbit_img = pygame.image.load("images/rabbit.png").convert_alpha()
         self.rabbit_img = pygame.transform.smoothscale(self.rabbit_img, (95, 100))
 
+    def reload_images(self):
+        """Reload all level images after display mode change."""
+        self.water_img = pygame.image.load("images/water.png")
+        self.water_img = pygame.transform.smoothscale(self.water_img, (50, 50))
+        
+        self.big_platform_img = pygame.image.load("images/big-platform.png")
+        self.big_platform_img = pygame.transform.scale(self.big_platform_img, (350, 100))
+        
+        self.small_platform_img = pygame.image.load("images/small-platform.png")
+        self.small_platform_img = pygame.transform.scale(self.small_platform_img, (150, 50))
+        
+        self.ice_platform_img = pygame.image.load("images/big-ice-platform.png")
+        
+        self.portal_img = pygame.image.load("images/portal.png")
+        self.portal_img = pygame.transform.smoothscale(self.portal_img, (80, 100))
+        
+        self.evil_tux_img = pygame.image.load("images/evil-penguin.png").convert_alpha()
+        self.evil_tux_img = pygame.transform.smoothscale(self.evil_tux_img, (40, 60))
+        
+        self.owl_img = pygame.image.load("images/owl.png").convert_alpha()
+        self.owl_img = pygame.transform.smoothscale(self.owl_img, (70, 70))
+        self.fox_img = pygame.image.load("images/fox.png").convert_alpha()
+        self.fox_img = pygame.transform.smoothscale(self.fox_img, (80, 60))
+        self.polar_bear_img = pygame.image.load("images/polar-bear.png").convert_alpha()
+        self.polar_bear_img = pygame.transform.smoothscale(self.polar_bear_img, (120, 105))
+        self.rabbit_img = pygame.image.load("images/rabbit.png").convert_alpha()
+        self.rabbit_img = pygame.transform.smoothscale(self.rabbit_img, (95, 100))
+
     def draw_lives(self, screen, player):
         """Draw life counter and heart icons."""
         if self.font is None:

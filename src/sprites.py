@@ -94,6 +94,9 @@ class Player(Sprites):
         self.falling_tux = pygame.image.load("images/falling-tux.png").convert_alpha()
         self.falling_tux = pygame.transform.smoothscale(self.falling_tux, (60, 60))
         
+        # Initialize direction state
+        self.direction = "normal"
+        
         # Load jump sound effect
         self.jump_sound = pygame.mixer.Sound("sound/jump.mp3")
 
@@ -163,6 +166,9 @@ class Player(Sprites):
             player_image = self.tux_left
         elif self.direction == "down":
             player_image = self.falling_tux
+        else:
+            # Default to base if direction is unknown
+            player_image = self.base
         
         self.image = player_image
         self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
@@ -187,6 +193,50 @@ class Player(Sprites):
     def reset_lives(self):
         """Reset life count to default."""
         self.lives = 3
+
+    def reload_images(self):
+        """Reload all player images after display mode change."""
+        self.base = pygame.image.load("images/basetux.png").convert_alpha()
+        self.base = pygame.transform.smoothscale(self.base, (40, 60))
+
+        self.tux_left = pygame.image.load("images/tux-left.png").convert_alpha()
+        self.tux_left = pygame.transform.smoothscale(self.tux_left, (40, 60))
+        
+        self.tux_right = pygame.image.load("images/tux-right.png").convert_alpha()
+        self.tux_right = pygame.transform.smoothscale(self.tux_right, (40, 60))
+
+        self.falling_tux = pygame.image.load("images/falling-tux.png").convert_alpha()
+        self.falling_tux = pygame.transform.smoothscale(self.falling_tux, (60, 60))
+        
+        # Reset direction and update current image
+        self.direction = "normal"
+        self.image = self.base
+        self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
+
+class Enemy(Sprites):
+    """
+    This class creates sprites for enemies against tux. They spawn
+    as red penguins, killing tux when it is touched.
+    """
+    def __init__(self):
+        """Initialize base enemy stats."""
+        super().__init__(width=40, height=40)
+        # Default values; specific enemies may override these
+        self.damage = 1
+        self.speed = 0
+        self.detection_range = 0
+
+    def hit_player(self, player):
+        """Handle collision with player (to be implemented by subclasses)."""
+        pass
+
+    def detect_player(self, player):
+        """Detect player within range (to be implemented by subclasses)."""
+        pass
+
+    def move(self):
+        """Move enemy (to be implemented by subclasses)."""
+        pass
 
 class Environment(Sprites):
     """
@@ -309,7 +359,15 @@ class Environment(Sprites):
                 # Import locally to avoid circular imports
                 from main import GameLevel
                 GameLevel(save_data=self.load_data, start_level=self.game_control.level)
-                return
+                
+                # After returning from GameLevel (after minigame), reinitialize pygame and screen
+                pygame.init()
+                self.screen = pygame.display.set_mode((1000, 600))
+                pygame.display.set_caption("Pebbles and Ice")
+                self.game_bg = pygame.image.load("images/game-background.png")
+                self.game_bg = pygame.transform.smoothscale(self.game_bg, (1000, 600))
+                # Continue loop to show level selection again
+                
             pygame.display.flip()
 
     def platforms(self):

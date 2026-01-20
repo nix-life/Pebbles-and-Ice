@@ -37,12 +37,15 @@ class Minigame:
 
 class IcePuzzle(Minigame):
     """Tile-based memory puzzle: find the safe ice path."""
-    def __init__(self):
+    def __init__(self, screen=None):
         """Initialize the ice puzzle grid, state, and loop."""
         super().__init__()
 
         pygame.init()
-        self.screen = pygame.display.set_mode((1000, 600))
+        if screen is not None:
+            self.screen = screen
+        else:
+            self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Ice Puzzle - Find the Path!")
         
         # Grid settings
@@ -445,12 +448,15 @@ class IcePuzzle(Minigame):
 
 class BlizzardSurvival(Minigame):
     """Dodge falling snowballs for a time-based score."""
-    def __init__(self):
+    def __init__(self, screen=None):
         """Initialize blizzard survival assets, state, and loop."""
         super().__init__()
 
         pygame.init()
-        self.screen = pygame.display.set_mode((1000, 600))
+        if screen is not None:
+            self.screen = screen
+        else:
+            self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Blizzard Survival - Dodge the Snowballs!")
         
         # Load Tux images
@@ -806,12 +812,15 @@ class BlizzardSurvival(Minigame):
 
 class FishFrenzy(Minigame):
     """Click falling fish before any escape."""
-    def __init__(self):
+    def __init__(self, screen=None):
         """Initialize fish frenzy assets, state, and loop."""
         super().__init__()
 
         pygame.init()
-        self.screen = pygame.display.set_mode((1000, 600))
+        if screen is not None:
+            self.screen = screen
+        else:
+            self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Fish Frenzy")
         
         # Load fish image
@@ -990,10 +999,13 @@ class FishFrenzy(Minigame):
 
 class LogicTrial(Minigame):
     """Multiple-choice quiz minigame with pass/fail logic."""
-    def __init__(self):
+    def __init__(self, screen=None):
         """Initialize quiz questions, visuals, and loop."""
         pygame.init()
-        self.screen = pygame.display.set_mode((1000, 600))
+        if screen is not None:
+            self.screen = screen
+        else:
+            self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Logic Trial - Animal Quiz")
     
         self.questions = [
