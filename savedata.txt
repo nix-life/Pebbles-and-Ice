@@ -380,3 +380,31 @@ achievements =
 total_deaths = 18
 total_playtime = 667.31
 
+[USER:charlie1]
+username = charlie1
+password = shao
+player_name = 
+levels_reached = 5
+highest_level_completed = 4
+blizzard_survival_best_time = 21.05
+ice_puzzle_best_attempts = 1
+fish_frenzy_high_score = 10
+logic_trial_best_score = 7
+achievements = 
+total_deaths = 9
+total_playtime = 143.68
+
+[USER:bob]
+username = bob
+password = joe
+player_name = 
+levels_reached = 5
+highest_level_completed = 4
+blizzard_survival_best_time = 24.40
+ice_puzzle_best_attempts = 1
+fish_frenzy_high_score = 10
+logic_trial_best_score = 8
+achievements = 
+total_deaths = 12
+total_playtime = 216.00
+

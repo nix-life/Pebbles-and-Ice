@@ -226,18 +226,6 @@ class Enemy(Sprites):
         self.speed = 0
         self.detection_range = 0
 
-    def hit_player(self, player):
-        """Handle collision with player (to be implemented by subclasses)."""
-        pass
-
-    def detect_player(self, player):
-        """Detect player within range (to be implemented by subclasses)."""
-        pass
-
-    def move(self):
-        """Move enemy (to be implemented by subclasses)."""
-        pass
-
 class Environment(Sprites):
     """
     This sprite includes all of the environment behind the scenes.
@@ -368,27 +356,3 @@ class Environment(Sprites):
                 # Continue loop to show level selection again
                 
             pygame.display.flip()
-
-    def platforms(self):
-        """Placeholder for future platform setup in the environment."""
-        pass
-
-    def update_environment(self):
-        """Placeholder for future environment updates."""
-        pass
-
-class NPC(Sprites):
-    """Non-player character with dialogue and optional minigame."""
-    def __init__(self):
-        """Initialize a generic NPC with dialogue and hint text."""
-        super().__init__(width=40, height=60)
-        self.dialogue = []
-        self.hint = ""
-
-    def talk(self):
-        """Placeholder for NPC dialogue interaction."""
-        pass
-
-    def start_minigame(self):
-        """Placeholder for launching an NPC minigame."""
-        pass

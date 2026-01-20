@@ -27,14 +27,6 @@ class PlayerStats(Data):
         pygame.init()
         self.boxes = {}
         self.game_controller = logic.GameController()
-
-    def intelligence_level(self):
-        """Placeholder for intelligence progression."""
-        pass
-
-    def add_fish(self):
-        """Placeholder for fish collection tracking."""
-        pass
     
     def get_text_input(self, screen, prompt):
         """Simple text input screen"""
@@ -169,19 +161,6 @@ class PlayerStats(Data):
         # No selection made yet
         return None
 
-class AchivementData(Data):
-    """Tracks achievements and minigame records (placeholder)."""
-    def __init__(self):
-        """Initialize achievement data container."""
-        super().__init__()
-
-    def unlock_achivements(self):
-        """Placeholder for achievement unlock logic."""
-        pass
-
-    def minigame_record(self):
-        """Placeholder for minigame record tracking."""
-        pass
 class SaveData(Data):
     """Persistent save data for a player profile."""
     SAVE_FILE = "savedata.txt"

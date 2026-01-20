@@ -12,11 +12,6 @@ import pygame
 from data import PlayerStats
 from minigames import FishFrenzy
 from sprites import Player
-class Logic:
-    """Base logic class placeholder for shared logic utilities."""
-    def __init__(self):
-        """Base logic class placeholder."""
-        pass
 
 class GameController:
     """Handles level selection UI and menu interactions."""
