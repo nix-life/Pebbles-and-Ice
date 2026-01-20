@@ -76,14 +76,10 @@ class Player(Sprites):
         self.lives = 3
         self.speed = 310
         self.jump = 800
-        # Ability list can be extended by unlocks
-        self.abilities = []
         self.on_ground = True
         self.on_ice = False  # Track if player is on ice platform
         self.spawn_x = x  # Store spawn position
         self.spawn_y = y
-        # Track fish collected in current level attempt (resets on death)
-        self.fish_collected_this_level = 0
 
         # Load animation frames
         self.base = pygame.image.load("images/basetux.png").convert_alpha()
@@ -191,14 +187,6 @@ class Player(Sprites):
     def reset_lives(self):
         """Reset life count to default."""
         self.lives = 3
-    
-    def reset_fish_count(self):
-        """Reset fish collected for current level attempt"""
-        self.fish_collected_this_level = 0
-    
-    def collect_fish(self):
-        """Add a fish to the current level count"""
-        self.fish_collected_this_level += 1
 
 class Enemy(Sprites):
     """

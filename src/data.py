@@ -21,20 +21,12 @@ class Data:
         pass
 
 class PlayerStats(Data):
-    """UI helper for player stats screens and ability unlocks."""
+    """UI helper for player stats screens."""
     def __init__(self):
-        """Initialize player stats UI state and unlocks."""
+        """Initialize player stats UI state."""
         pygame.init()
         self.boxes = {}
         self.game_controller = logic.GameController()
-        self.double_jump_unlocked = False
-
-    def unlock_ability(self, level):
-        """Unlock abilities based on completed level."""
-        if level >= 2:
-            self.double_jump_unlocked = True
-        elif level > 3:
-            pass
 
     def intelligence_level(self):
         """Placeholder for intelligence progression."""
@@ -206,8 +198,6 @@ class SaveData(Data):
         self.highest_level_completed = 0
         self.fish_collected = 0
         self.total_fish_ever = 0
-        self.double_jump_unlocked = False
-        self.intelligence_boost_unlocked = False
         self.blizzard_survival_best_time = 0.0
         self.ice_puzzle_best_attempts = 0
         self.fish_frenzy_high_score = 0
@@ -255,10 +245,6 @@ class SaveData(Data):
                         self.fish_collected = int(value)
                     elif key == "total_fish_ever":
                         self.total_fish_ever = int(value)
-                    elif key == "double_jump_unlocked":
-                        self.double_jump_unlocked = value == "True"
-                    elif key == "intelligence_boost_unlocked":
-                        self.intelligence_boost_unlocked = value == "True"
                     elif key == "blizzard_survival_best_time":
                         self.blizzard_survival_best_time = float(value)
                     elif key == "ice_puzzle_best_attempts":
@@ -326,8 +312,6 @@ class SaveData(Data):
         current_user_data.append("highest_level_completed = %d\n" % self.highest_level_completed)
         current_user_data.append("fish_collected = %d\n" % self.fish_collected)
         current_user_data.append("total_fish_ever = %d\n" % self.total_fish_ever)
-        current_user_data.append("double_jump_unlocked = %s\n" % self.double_jump_unlocked)
-        current_user_data.append("intelligence_boost_unlocked = %s\n" % self.intelligence_boost_unlocked)
         current_user_data.append("blizzard_survival_best_time = %.2f\n" % self.blizzard_survival_best_time)
         current_user_data.append("ice_puzzle_best_attempts = %d\n" % self.ice_puzzle_best_attempts)
         current_user_data.append("fish_frenzy_high_score = %d\n" % self.fish_frenzy_high_score)
@@ -382,18 +366,6 @@ class SaveData(Data):
         if level > self.highest_level_completed:
             self.highest_level_completed = level
 
-    def add_fish(self, amount=1):
-        """Increment fish counters for the current session and total."""
-        self.fish_collected += amount
-        self.total_fish_ever += amount
-
-    def unlock_ability(self, ability_name):
-        """Unlock a specific ability by name."""
-        if ability_name == "double_jump":
-            self.double_jump_unlocked = True
-        elif ability_name == "intelligence_boost":
-            self.intelligence_boost_unlocked = True
-
     def update_blizzard_time(self, time_survived):
         """Update best survival time if higher."""
         if time_survived > self.blizzard_survival_best_time:
@@ -438,18 +410,6 @@ class SaveData(Data):
     def get_level_reached(self):
         """Return the furthest level reached."""
         return self.levels_reached
-
-    def get_fish_count(self):
-        """Return fish collected in current profile."""
-        return self.fish_collected
-
-    def has_ability(self, ability_name):
-        """Check if a named ability is unlocked."""
-        if ability_name == "double_jump":
-            return self.double_jump_unlocked
-        elif ability_name == "intelligence_boost":
-            return self.intelligence_boost_unlocked
-        return False
 
     def get_minigame_stats(self):
         """Return a dict of best minigame stats."""
@@ -517,7 +477,7 @@ class TutorialData(Data):
                 "STORY:",
                 "You are a penguin named Tux.",
                 "Your goal is to bring a pebble to your friend Domino.",
-                "Collect fish to score high on the leaderboard!",
+                "Becarewful of the icy terrain and obstacles along the way!",
                 "",
                 "Press any key or click to continue..."
             ]

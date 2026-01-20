@@ -24,15 +24,13 @@ levels_reached = 5
 highest_level_completed = 5
 fish_collected = 25
 total_fish_ever = 25
-double_jump_unlocked = False
-intelligence_boost_unlocked = False
 blizzard_survival_best_time = 0.00
 ice_puzzle_best_attempts = 0
 fish_frenzy_high_score = 0
 logic_trial_best_score = 0
 achievements = 
-total_deaths = 13
-total_playtime = 266.54
+total_deaths = 25
+total_playtime = 431.88
 
 [USER:h]
 username = h
@@ -141,4 +139,110 @@ logic_trial_best_score = 0
 achievements = 
 total_deaths = 0
 total_playtime = 1.63
+
+[USER:test]
+username = test
+password = a
+player_name = 
+levels_reached = 2
+highest_level_completed = 1
+fish_collected = 14
+total_fish_ever = 14
+double_jump_unlocked = False
+intelligence_boost_unlocked = False
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 0
+total_playtime = 18.96
+
+[USER:test1]
+username = test1
+password = a
+player_name = 
+levels_reached = 3
+highest_level_completed = 2
+fish_collected = 16
+total_fish_ever = 16
+double_jump_unlocked = False
+intelligence_boost_unlocked = False
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 5
+total_playtime = 44.87
+
+[USER:test2]
+username = test2
+password = a
+player_name = 
+levels_reached = 1
+highest_level_completed = 0
+fish_collected = 0
+total_fish_ever = 0
+double_jump_unlocked = False
+intelligence_boost_unlocked = False
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 0
+total_playtime = 0.00
+
+[USER:test3]
+username = test3
+password = a
+player_name = 
+levels_reached = 2
+highest_level_completed = 1
+fish_collected = -1
+total_fish_ever = 0
+double_jump_unlocked = False
+intelligence_boost_unlocked = False
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 3
+total_playtime = 25.15
+
+[USER:crashout]
+username = crashout
+password = a
+player_name = 
+levels_reached = 1
+highest_level_completed = 0
+fish_collected = 0
+total_fish_ever = 0
+double_jump_unlocked = False
+intelligence_boost_unlocked = False
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 0
+total_playtime = 0.00
+
+[USER:tester]
+username = tester
+password = a
+player_name = 
+levels_reached = 5
+highest_level_completed = 4
+fish_collected = 0
+total_fish_ever = 0
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 28
+total_playtime = 219.57
 

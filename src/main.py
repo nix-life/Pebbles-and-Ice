@@ -46,6 +46,14 @@ class GameLevel:
         self.level_manager.current_level = start_level
         # Frames remaining to display the "Game Saved!" message
         self.save_message_timer = 0
+        
+        # Final scene state variables
+        self.final_scene_dialogue_started = False
+        self.final_scene_dialogue_timer = 0
+        self.final_scene_floor = None
+        self.domino_x = 900
+        self.domino_y = 480
+        self.domino_img = None
 
         # Start the game loop immediately after setup
         self.loop()
@@ -89,6 +97,12 @@ class GameLevel:
         keep_going = True
 
         while keep_going:
+            
+            # Set level-specific jump power BEFORE processing input
+            if self.current_state == "level_4" or self.current_state == "level_5":
+                self.player.jump = 650  # Reduced jump for levels 4 and 5
+            else:
+                self.player.jump = 800  # Normal jump for other levels
 
             # Exit early if window closed
             if not self.event_handling():
@@ -202,26 +216,100 @@ class GameLevel:
                 level5 = self.level_manager.level_5(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
                 if level5 == "done":
-                    # Mark final completion and switch to end screen
-                    # Game complete! Return to menu or show credits
+                    # Mark final completion and switch to final scene
                     self.save_data.complete_level(5)
-                    # Could add a credits screen or return to menu here
-                    self.current_state = "game_complete"
+                    self.current_state = "final_scene"
+                    # Reset player for final scene (platform is at y=520, player is 60px tall)
+                    self.player.spawn_x = 100
+                    self.player.spawn_y = 460  # 520 - 60 = 460 to be on platform
+                    self.player.reset_position()
+                    self.player.reset_lives()
+                    self.player.vel.x = 0
+                    self.player.vel.y = 0
+                    # Initialize final scene
+                    self.final_scene_dialogue_started = False
+                    self.final_scene_dialogue_timer = 0
 
+            elif self.current_state == "final_scene":
+                # Get delta time
+                dt = self.clock.tick(60) / 1000.0
+                
+                # Load domino image if not loaded
+                if self.domino_img is None:
+                    self.domino_img = pygame.image.load("images/domino.png")
+                    self.domino_img = pygame.transform.smoothscale(self.domino_img, (60, 80))
+                
+                # Create floor platform (entire width)
+                if self.final_scene_floor is None:
+                    floor_img = pygame.image.load("images/big-platform.png")
+                    floor_img = pygame.transform.scale(floor_img, (1000, 80))
+                    self.final_scene_floor = {'img': floor_img, 'x': 0, 'y': 520, 'w': 1000, 'h': 80}
+                
+                # Apply physics to player
+                platform_rect = pygame.Rect(self.final_scene_floor['x'], self.final_scene_floor['y'], 
+                                           self.final_scene_floor['w'], self.final_scene_floor['h'])
+                self.physics.apply_gravity(self.player, dt)
+                self.player.update(dt)
+                self.physics.handle_collisions(self.player, [platform_rect], [])
+                self.physics.apply_friction(self.player, dt)
+                
+                # Draw background
+                self.screen.blit(self.game_bg, (0, 0))
+                
+                # Draw floor platform
+                self.screen.blit(self.final_scene_floor['img'], (self.final_scene_floor['x'], self.final_scene_floor['y']))
+                
+                # Draw player
+                self.player.draw(self.screen)
+                
+                # Draw lives counter to verify rendering
+                self.level_manager.draw_lives(self.screen, self.player)
+                
+                # Draw domino character at the end
+                self.screen.blit(self.domino_img, (self.domino_x, self.domino_y))
+                
+                # Check proximity to domino (20 pixels)
+                distance_to_domino = abs(self.player.rect.x - self.domino_x)
+                
+                if distance_to_domino <= 20 and not self.final_scene_dialogue_started:
+                    self.final_scene_dialogue_started = True
+                    self.final_scene_dialogue_timer = pygame.time.get_ticks()
+                
+                # Show dialogue
+                if self.final_scene_dialogue_started:
+                    elapsed_time = (pygame.time.get_ticks() - self.final_scene_dialogue_timer) / 1000.0
+                    
+                    if elapsed_time < 10:
+                        # Show domino's dialogue for 10 seconds
+                        dialogue_font = pygame.font.Font(None, 32)
+                        dialogue_lines = [
+                            "Domino: You made it, my friend!",
+                            "The perfect pebble, shaped by ice and time.",
+                            "Thank you for this precious gift!"
+                        ]
+                        
+                        # Draw dialogue box
+                        box_height = 120
+                        box_y = 50
+                        pygame.draw.rect(self.screen, (0, 0, 0, 180), (50, box_y, 900, box_height), border_radius=10)
+                        pygame.draw.rect(self.screen, (255, 215, 0), (50, box_y, 900, box_height), 3, border_radius=10)
+                        
+                        # Draw dialogue lines
+                        for i, line in enumerate(dialogue_lines):
+                            text = dialogue_font.render(line, True, (255, 255, 255))
+                            self.screen.blit(text, (70, box_y + 20 + i * 35))
+                    else:
+                        # After 10 seconds, show thank you screen
+                        self.current_state = "game_complete"
+            
             elif self.current_state == "game_complete":
-                # Simple completion screen once all levels are cleared
+                # Thank you screen
                 self.screen.fill((20, 20, 40))
                 # Large title text
-                font = pygame.font.Font(None, 72)
-                text = font.render("Congratulations!", True, (255, 215, 0))
-                text_rect = text.get_rect(center=(500, 250))
+                font = pygame.font.Font(None, 100)
+                text = font.render("THANK YOU FOR PLAYING!", True, (255, 215, 0))
+                text_rect = text.get_rect(center=(500, 300))
                 self.screen.blit(text, text_rect)
-                
-                # Subtitle text
-                font2 = pygame.font.Font(None, 48)
-                text2 = font2.render("You completed all 5 levels!", True, (255, 255, 255))
-                text_rect2 = text2.get_rect(center=(500, 350))
-                self.screen.blit(text2, text_rect2)
             
             # Draw save message if active
             self.draw_save_message()
