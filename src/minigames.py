@@ -1176,5 +1176,3 @@ class LogicTrial(Minigame):
                 self.draw_question()
             
             pygame.display.flip()
-
-BlizzardSurvival()
