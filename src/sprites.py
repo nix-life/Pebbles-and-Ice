@@ -63,23 +63,31 @@ class Player(Sprites):
         self.falling_tux = pygame.transform.smoothscale(self.falling_tux, (60, 60))
 
     def movement(self, keys):
-        # On ice, movement is slower and adds to existing velocity (sliding)
-        if self.on_ice:
-            ice_acceleration = 15  # How fast player accelerates on ice
+        # Check if on ice - sliding movement with momentum
+        if self.on_ice and self.on_ground:
+            # On ice: gradual acceleration, player slides and keeps momentum
+            ice_accel = 12
             if keys[pygame.K_a]:
-                self.vel.x -= ice_acceleration
-            elif keys[pygame.K_d]:
-                self.vel.x += ice_acceleration
+                self.vel.x -= ice_accel
+            if keys[pygame.K_d]:
+                self.vel.x += ice_accel
             # Clamp max speed on ice
             max_ice_speed = self.speed * 1.2
-            self.vel.x = max(-max_ice_speed, min(max_ice_speed, self.vel.x))
+            if self.vel.x > max_ice_speed:
+                self.vel.x = max_ice_speed
+            elif self.vel.x < -max_ice_speed:
+                self.vel.x = -max_ice_speed
+            # Note: friction is applied separately in Physics.apply_friction()
         else:
-            # Normal ground - direct control
-            self.vel.x = 0
+            # Normal ground - instant directional control
             if keys[pygame.K_a]:
                 self.vel.x = -self.speed
             elif keys[pygame.K_d]:
                 self.vel.x = self.speed
+            else:
+                # Only stop instantly if on ground and not on ice
+                if self.on_ground:
+                    self.vel.x = 0
 
         if (keys[pygame.K_w] or keys[pygame.K_SPACE]) and self.on_ground:
             self.vel.y = -self.jump

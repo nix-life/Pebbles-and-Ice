@@ -201,7 +201,7 @@ class Physics:
         self.gravity = 2000
         self.max_fall_speed = 1600
         self.ground_friction = 1800
-        self.ice_friction = 150  # Much lower friction for ice - causes sliding
+        self.ice_friction = 30  # Very low friction for ice - player slides a lot
 
     def apply_gravity(self, player, dt):
         player.vel.y += self.gravity * dt
@@ -209,7 +209,13 @@ class Physics:
             player.vel.y = self.max_fall_speed
 
     def apply_friction(self, player, dt, surface_friction=None):
+        # Only apply friction when on ground
         if not getattr(player, "on_ground", False):
+            return
+        
+        # Don't apply friction if player is actively pressing movement keys
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] or keys[pygame.K_d]:
             return
 
         # Use ice friction if on ice, otherwise normal ground friction
@@ -255,9 +261,12 @@ class Physics:
                     player.pos.y = player.rect.y
                     player.vel.y = 0
                     player.on_ground = True
-                    # Check if this platform is ice
-                    if rect in ice_platforms:
-                        player.on_ice = True
+                    # Check if standing on any ice platform by checking collision with each
+                    for ice_rect in ice_platforms:
+                        if player.rect.colliderect(ice_rect) or (abs(player.rect.bottom - ice_rect.top) <= 5 and 
+                            player.rect.right > ice_rect.left and player.rect.left < ice_rect.right):
+                            player.on_ice = True
+                            break
                 elif min_overlap == overlap_bottom and player.vel.y < 0:
                     player.rect.top = rect.bottom
                     player.pos.y = player.rect.y
@@ -364,13 +373,13 @@ class LevelManager:
         big_platform = pygame.transform.scale(self.big_platform_img, (250, 80))
 
         # Level 1: 7 platforms with variety - ascending to portal at top
-        # Mark which platforms are ice with 'ice': True
+        # Mark which platforms are ice with 'ice': True - ice platforms are slippery!
         platforms = [
             {'img': self.small_platform_img, 'x': 435, 'y': 450, 'w': 150, 'h': 50, 'ice': False},
             {'img': self.ice_platform_img, 'x': 650, 'y': 380, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
             {'img': big_platform, 'x': 130, 'y': 300, 'w': 250, 'h': 70, 'ice': False},
             {'img': big_platform, 'x': 50, 'y': 535, 'w': 250, 'h': 70, 'ice': False},
-            {'img': self.small_platform_img, 'x': 600, 'y': 250, 'w': 150, 'h': 50, 'ice': False},
+            {'img': self.ice_platform_img, 'x': 580, 'y': 250, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
             {'img': self.small_platform_img, 'x': 750, 'y': 100, 'w': 150, 'h': 50, 'ice': False},
         ]
         
@@ -502,14 +511,14 @@ class LevelManager:
         big_platform = pygame.transform.scale(self.big_platform_img, (200, 70))
         small_platform = pygame.transform.scale(self.small_platform_img, (120, 40))
 
-        # Level 2: Harder layout with 2 ice platforms and more gaps
+        # Level 2: Harder layout with ice platforms and more gaps - watch your momentum!
         platforms = [
             {'img': big_platform, 'x': 50, 'y': 480, 'w': 200, 'h': 70, 'ice': False},
-            {'img': small_platform, 'x': 300, 'y': 420, 'w': 120, 'h': 40, 'ice': False},
+            {'img': self.ice_platform_img, 'x': 280, 'y': 420, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
             {'img': small_platform, 'x': 200, 'y': 330, 'w': 120, 'h': 40, 'ice': False},
             {'img': self.ice_platform_img, 'x': 380, 'y': 250, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
-            {'img': small_platform, 'x': 620, 'y': 200, 'w': 120, 'h': 40, 'ice': False},
-            {'img': big_platform, 'x': 750, 'y': 120, 'w': 200, 'h': 70, 'ice': False},
+            {'img': self.ice_platform_img, 'x': 600, 'y': 180, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
+            {'img': big_platform, 'x': 780, 'y': 120, 'w': 200, 'h': 70, 'ice': False},
         ]
         
         # Create collision rects and identify ice platforms
@@ -644,13 +653,14 @@ class LevelManager:
         tiny_platform = pygame.transform.scale(self.small_platform_img, (85, 32))
         medium_platform = pygame.transform.scale(self.big_platform_img, (160, 50))
 
-        # Level 3: Longer layout with smaller platforms and more spread out
+        # Level 3: Longer layout with smaller platforms and ice - watch for sliding!
+        ice_small = pygame.transform.scale(self.ice_platform_img, (110, 38))
         platforms = [
             {'img': medium_platform, 'x': 30, 'y': 520, 'w': 160, 'h': 50, 'ice': False},
-            {'img': small_platform, 'x': 360, 'y': 425, 'w': 110, 'h': 38, 'ice': False},
+            {'img': ice_small, 'x': 360, 'y': 425, 'w': 110, 'h': 38, 'ice': True},
             {'img': tiny_platform, 'x': 380, 'y': 285, 'w': 85, 'h': 32, 'ice': False},
             {'img': medium_platform, 'x': 380, 'y': 165, 'w': 160, 'h': 35, 'ice': False, 'has_enemy': True},
-            {'img': tiny_platform, 'x': 600, 'y': 100, 'w': 85, 'h': 32, 'ice': False},
+            {'img': ice_small, 'x': 600, 'y': 100, 'w': 110, 'h': 38, 'ice': True},
             {'img': small_platform, 'x': 750, 'y': 90, 'w': 110, 'h': 38, 'ice': False},
         ]
         
@@ -833,38 +843,43 @@ class LevelManager:
         original_jump = player.jump
         player.jump = 550  # Lower jump height
         
-        # Level 4: Complex zigzag layout with enemy
+        # Level 4: Complex zigzag layout with enemy and slippery ice platforms
+        ice_tiny = pygame.transform.scale(self.ice_platform_img, (80, 30))
+        ice_small = pygame.transform.scale(self.ice_platform_img, (110, 38))
         platforms = [
             # Start bottom left
             {'img': medium_platform, 'x': 30, 'y': 520, 'w': 150, 'h': 45, 'ice': False},
-            # Go right first
-            {'img': small_platform, 'x': 250, 'y': 460, 'w': 110, 'h': 38, 'ice': False},
+            # Go right first - some ice platforms make it tricky!
+            {'img': ice_small, 'x': 250, 'y': 460, 'w': 110, 'h': 38, 'ice': True},
             {'img': tiny_platform, 'x': 420, 'y': 410, 'w': 80, 'h': 30, 'ice': False},
             {'img': medium_platform, 'x': 580, 'y': 360, 'w': 150, 'h': 45, 'ice': False, 'has_enemy': True},
             # Now must go back left to continue up
-            {'img': tiny_platform, 'x': 420, 'y': 300, 'w': 80, 'h': 30, 'ice': False},
+            {'img': ice_tiny, 'x': 420, 'y': 300, 'w': 80, 'h': 30, 'ice': True},
             {'img': small_platform, 'x': 250, 'y': 250, 'w': 110, 'h': 38, 'ice': False},
             {'img': tiny_platform, 'x': 100, 'y': 190, 'w': 80, 'h': 30, 'ice': False},
-            # Now go right again to reach portal
-            {'img': small_platform, 'x': 280, 'y': 140, 'w': 110, 'h': 38, 'ice': False},
+            # Now go right again to reach portal - more ice!
+            {'img': ice_small, 'x': 280, 'y': 140, 'w': 110, 'h': 38, 'ice': True},
             {'img': tiny_platform, 'x': 450, 'y': 100, 'w': 80, 'h': 30, 'ice': False},
-            {'img': small_platform, 'x': 600, 'y': 60, 'w': 110, 'h': 38, 'ice': False},
+            {'img': ice_small, 'x': 600, 'y': 60, 'w': 110, 'h': 38, 'ice': True},
             {'img': medium_platform, 'x': 780, 'y': 100, 'w': 150, 'h': 45, 'ice': False},
         ]
         
-        # Create collision rects
+        # Create collision rects and identify ice platforms
         platform_rects = []
         for p in platforms:
             platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
         
-        all_collision_rects = platform_rects
+        ice_platform_rects = []
+        for p in platforms:
+            if p['ice']:
+                ice_platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
 
         # Invisible walls
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
         right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
         ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
         
-        all_collision_rects.extend([left_wall, right_wall, ceiling])
+        all_collision_rects = platform_rects + [left_wall, right_wall, ceiling]
 
         water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
 
@@ -937,7 +952,7 @@ class LevelManager:
         if not self.is_dying:
             physics.apply_gravity(player, dt)
             player.update(dt)
-            physics.handle_collisions(player, all_collision_rects, [])
+            physics.handle_collisions(player, all_collision_rects, ice_platform_rects)
             physics.apply_friction(player, dt)
             
             if physics.check_water_collision(player, water_hitbox):
