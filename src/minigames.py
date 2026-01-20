@@ -332,11 +332,6 @@ class IcePuzzle(Minigame):
         # Attempts counter
         attempts_text = self.font_small.render("Attempts: %d" % self.attempts, True, (100, 100, 100))
         self.screen.blit(attempts_text, (20, 560))
-        
-        # Progress
-        progress = len(self.visited) / len(self.path) * 100
-        progress_text = self.font_small.render("Progress: %.0f%%" % progress, True, (100, 100, 100))
-        self.screen.blit(progress_text, (850, 560))
 
     def draw_game_over(self):
         """Draw falling or winning screen"""
@@ -917,7 +912,7 @@ class FishFrenzy(Minigame):
         
         if self.complete_timer > 20:
             # Check if player met minimum requirement
-            if self.score >= 15:
+            if self.score >= 5:
                 title_text = self.font_large.render("Success!", True, (100, 255, 100))
                 subtitle_text = self.font_medium.render("You caught enough fish!", True, (150, 255, 150))
                 title_color = (100, 255, 100)
@@ -930,11 +925,11 @@ class FishFrenzy(Minigame):
             self.screen.blit(subtitle_text, (500 - subtitle_text.get_width() / 2, 260))
             
             # Final score
-            score_text = self.font_medium.render("Final Score: %d / 15 minimum" % self.score, True, (255, 255, 255))
+            score_text = self.font_medium.render("Final Score: %d / 7 minimum" % self.score, True, (255, 255, 255))
             self.screen.blit(score_text, (500 - score_text.get_width() / 2, 340))
             
             # Continue or restart
-            if self.score >= 15:
+            if self.score >= 5:
                 continue_text = self.font_small.render("Press SPACE to continue", True, (200, 200, 200))
             else:
                 continue_text = self.font_small.render("Minimum not met - Press R to restart", True, (255, 100, 100))
@@ -968,16 +963,16 @@ class FishFrenzy(Minigame):
             self.draw_fish()
             
             # Draw score
-            if self.score >= 15:
+            if self.score >= 7:
                 score_color = (100, 255, 100)
             else:
                 score_color = (255, 255, 255)
-            score_text = self.font.render("Score: %s (min: 15)" % self.score, True, score_color)
+            score_text = self.font.render("Score: %s (min: 7)" % self.score, True, score_color)
             self.screen.blit(score_text, (10, 10))
             
             # Draw minimum requirement reminder
             if not self.game_complete:
-                reminder_text = self.font_small.render("Minimum 15 fish - Don't let any escape!", True, (100, 100, 100))
+                reminder_text = self.font_small.render("Minimum 7 fish - Don't let any escape!", True, (100, 100, 100))
                 self.screen.blit(reminder_text, (500 - reminder_text.get_width() / 2, 560))
             
             # Draw game complete screen if applicable
@@ -991,7 +986,7 @@ class FishFrenzy(Minigame):
                     pygame.quit()
                     exit()
                 elif event.type == pygame.KEYDOWN and self.game_complete:
-                    if self.score >= 15:
+                    if self.score >= 7:
                         # Can continue if minimum met
                         if event.key == pygame.K_SPACE:
                             if not self.win_sound_played:

@@ -366,3 +366,17 @@ achievements =
 total_deaths = 9
 total_playtime = 116.84
 
+[USER:feng]
+username = feng
+password = 123
+player_name = 
+levels_reached = 5
+highest_level_completed = 5
+blizzard_survival_best_time = 24.30
+ice_puzzle_best_attempts = 2
+fish_frenzy_high_score = 7
+logic_trial_best_score = 10
+achievements = 
+total_deaths = 18
+total_playtime = 667.31
+
