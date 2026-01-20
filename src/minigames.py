@@ -82,6 +82,11 @@ class IcePuzzle(Minigame):
         self.font_large = pygame.font.Font(None, 72)
         self.font_medium = pygame.font.Font(None, 48)
         self.font_small = pygame.font.Font(None, 32)
+        
+        # Load sound effects
+        self.death_sound = pygame.mixer.Sound("sound/death.wav")
+        self.win_sound = pygame.mixer.Sound("sound/win.mp3")
+        self.win_sound_played = False
 
         self.loop()
 
@@ -428,12 +433,16 @@ class IcePuzzle(Minigame):
                                 # Check for win
                                 if clicked_tile == self.path[-1]:
                                     self.game_state = "won"
+                                    if not self.win_sound_played:
+                                        self.win_sound.play()  # Play win sound
+                                        self.win_sound_played = True
                             else:
                                 # Fell through!
                                 self.player_pos = clicked_tile
                                 self.game_state = "falling"
                                 self.fall_timer = 0
                                 self.fall_offset = 0
+                                self.death_sound.play()  # Play death sound
 
 class BlizzardSurvival(Minigame):
     """Dodge falling snowballs for a time-based score."""
@@ -492,6 +501,11 @@ class BlizzardSurvival(Minigame):
         self.font_large = pygame.font.Font(None, 72)
         self.font_medium = pygame.font.Font(None, 48)
         self.font_small = pygame.font.Font(None, 36)
+        
+        # Load sound effects
+        self.death_sound = pygame.mixer.Sound("sound/death.wav")
+        self.win_sound = pygame.mixer.Sound("sound/win.mp3")
+        self.win_sound_played = False
 
         self.loop()
 
@@ -727,6 +741,7 @@ class BlizzardSurvival(Minigame):
                 if hit_ball:
                     self.game_over = True
                     self.screen_shake = 10
+                    self.death_sound.play()  # Play death sound
             else:
                 # Let the game-over overlay fade in
                 self.game_over_timer += 1
@@ -773,6 +788,9 @@ class BlizzardSurvival(Minigame):
                     if time_survived >= 20:
                         # Can continue if minimum met
                         if event.key == pygame.K_SPACE:
+                            if not self.win_sound_played:
+                                self.win_sound.play()  # Play win sound
+                                self.win_sound_played = True
                             keep_going = False
                             break
                     else:
@@ -818,6 +836,11 @@ class FishFrenzy(Minigame):
         # Game state
         self.game_complete = False
         self.complete_timer = 0
+        
+        # Load sound effects
+        self.death_sound = pygame.mixer.Sound("sound/death.wav")
+        self.win_sound = pygame.mixer.Sound("sound/win.mp3")
+        self.win_sound_played = False
 
         self.loop()
 
@@ -846,6 +869,7 @@ class FishFrenzy(Minigame):
                 self.falling_fish.remove(fish)
                 # Fish escaped - game over
                 self.game_complete = True
+                self.death_sound.play()  # Play death sound
 
     def draw_fish(self):
         """Draw all falling fish"""
@@ -950,6 +974,9 @@ class FishFrenzy(Minigame):
                     if self.score >= 25:
                         # Can continue if minimum met
                         if event.key == pygame.K_SPACE:
+                            if not self.win_sound_played:
+                                self.win_sound.play()  # Play win sound
+                                self.win_sound_played = True
                             keep_going = False
                             break
                     else:
@@ -1005,6 +1032,11 @@ class LogicTrial(Minigame):
         self.question_font = pygame.font.SysFont("verdana", 28)
         self.option_font = pygame.font.SysFont("verdana", 24)
         self.small_font = pygame.font.SysFont("verdana", 20)
+        
+        # Load sound effects
+        self.death_sound = pygame.mixer.Sound("sound/death.wav")
+        self.win_sound = pygame.mixer.Sound("sound/win.mp3")
+        self.win_sound_played = False
 
         self.loop()
         pygame.quit()
@@ -1184,9 +1216,13 @@ class LogicTrial(Minigame):
                                 self.score = 0
                                 self.game_state = "playing"
                                 self.feedback_timer = 0
+                                self.death_sound.play()  # Play death sound on restart
                         else:
                             # Can continue if passed
                             if event.key == pygame.K_SPACE:
+                                if not self.win_sound_played:
+                                    self.win_sound.play()  # Play win sound
+                                    self.win_sound_played = True
                                 keep_going = False
                                 break
             

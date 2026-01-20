@@ -109,6 +109,7 @@ class GameLevel:
                     self.level_manager.current_level = 2
                     # Reset per-level flags in LevelManager
                     self.level_manager.level_complete = False
+                    self.level_manager.level_complete_sound_played = False
                     
                     # Update save data
                     self.save_data.complete_level(1)
@@ -135,6 +136,7 @@ class GameLevel:
                     self.current_state = "level_3"
                     self.level_manager.current_level = 3
                     self.level_manager.level_complete = False
+                    self.level_manager.level_complete_sound_played = False
                     
                     # Update save data
                     self.save_data.complete_level(2)
@@ -152,6 +154,7 @@ class GameLevel:
                     self.current_state = "level_4"
                     self.level_manager.current_level = 4
                     self.level_manager.level_complete = False
+                    self.level_manager.level_complete_sound_played = False
                     
                     # Update save data
                     self.save_data.complete_level(3)
@@ -177,6 +180,7 @@ class GameLevel:
                     self.current_state = "level_5"
                     self.level_manager.current_level = 5
                     self.level_manager.level_complete = False
+                    self.level_manager.level_complete_sound_played = False
                     
                     # Update save data
                     self.save_data.complete_level(4)

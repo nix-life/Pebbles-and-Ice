@@ -97,6 +97,9 @@ class Player(Sprites):
 
         self.falling_tux = pygame.image.load("images/falling-tux.png").convert_alpha()
         self.falling_tux = pygame.transform.smoothscale(self.falling_tux, (60, 60))
+        
+        # Load jump sound effect
+        self.jump_sound = pygame.mixer.Sound("sound/jump.mp3")
 
     def movement(self, keys):
         """Handle player input and apply movement intent to velocity."""
@@ -130,6 +133,7 @@ class Player(Sprites):
             # Only allow jumps when grounded
             self.vel.y = -self.jump
             self.on_ground = False
+            self.jump_sound.play()  # Play jump sound effect
 
         # Update sprite based on state
         self.update_sprite()
@@ -230,7 +234,20 @@ class Environment(Sprites):
         """Initialize main menu environment and assets."""
         import logic, data
         pygame.init()
+        pygame.mixer.init()  # Initialize sound mixer
         pygame.display.set_caption("Pebbles and Ice")
+        
+        # Load sound effects
+        self.click_sound = pygame.mixer.Sound("sound/click.mp3")
+        self.death_sound = pygame.mixer.Sound("sound/death.wav")
+        self.jump_sound = pygame.mixer.Sound("sound/jump.mp3")
+        self.win_sound = pygame.mixer.Sound("sound/win.mp3")
+        
+        # Start background music (loops indefinitely)
+        pygame.mixer.music.load("sound/background-music.mp3")
+        pygame.mixer.music.set_volume(0.5)  # Set to 50% volume
+        pygame.mixer.music.play(-1)  # -1 means loop forever
+        
         # Load/save handlers and controllers
         self.loading = data.PlayerStats()
         self.load_data = data.SaveData()
@@ -273,6 +290,7 @@ class Environment(Sprites):
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self.button_rect.collidepoint(event.pos) and not clicked_button:
                         # Visual feedback when the start button is pressed
+                        self.click_sound.play()
                         self.current_bg = self.clicked
                 elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     # Start the transition once the mouse is released

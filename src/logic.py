@@ -28,6 +28,8 @@ class GameController:
         self.level = 1
         self.view_stats_button = None
         self.showing_stats = False
+        # Load click sound effect
+        self.click_sound = pygame.mixer.Sound("sound/click.mp3")
 
     def update_game(self, screen, events, save_data=None):
         """Render level selection screen and handle selection input."""
@@ -88,7 +90,7 @@ class GameController:
                 # Draw locked level in gray
                 pygame.draw.rect(screen, (100, 100, 100), box_rect, border_radius=10)
                 # Draw lock icon
-                lock_text = lock_font.render("🔒", True, (50, 50, 50))
+                lock_text = lock_font.render(" ", True, (50, 50, 50))
                 lock_rect = lock_text.get_rect(center=(x + 62, y + 62))
                 screen.blit(lock_text, lock_rect)
             else:
@@ -110,26 +112,32 @@ class GameController:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.view_stats_button and self.view_stats_button.collidepoint(event.pos):
+                    self.click_sound.play()
                     if save_data:
                         self.display_stats_screen(screen, save_data)
                 elif self.boxes[1].collidepoint(event.pos):
                     # Level 1 is always unlocked
+                    self.click_sound.play()
                     self.level = 1
                     return "start_game"
                 elif self.boxes[2].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 1:
+                        self.click_sound.play()
                         self.level = 2
                         return "start_game"
                 elif self.boxes[3].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 2:
+                        self.click_sound.play()
                         self.level = 3
                         return "start_game"
                 elif self.boxes[4].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 3:
+                        self.click_sound.play()
                         self.level = 4
                         return "start_game"
                 elif self.boxes[5].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 4:
+                        self.click_sound.play()
                         self.level = 5
                         return "start_game"
                     
@@ -344,6 +352,11 @@ class LevelManager:
         self.death_timer = 0
         self.is_dying = False
         self.feedback_timer = 0
+        
+        # Load sound effects
+        self.death_sound = pygame.mixer.Sound("sound/death.wav")
+        self.win_sound = pygame.mixer.Sound("sound/win.mp3")
+        self.level_complete_sound_played = False  # Track if win sound has been played
 
     def draw_lives(self, screen, player):
         """Draw life counter and heart icons."""
@@ -464,6 +477,7 @@ class LevelManager:
             if physics.check_water_collision(player, water_hitbox):
                 self.is_dying = True
                 self.death_timer = 30  # Half second death animation
+                self.death_sound.play()  # Play death sound
             
             # Check portal collision (level complete)
             if player.rect.colliderect(portal_rect):
@@ -492,6 +506,9 @@ class LevelManager:
             screen.blit(death_text, text_rect)
         
         if self.level_complete:
+            if not self.level_complete_sound_played:
+                self.win_sound.play()  # Play win sound
+                self.level_complete_sound_played = True
             win_text = self.font.render("Level 1 Finished!", True, (100, 255, 100))
             text_rect = win_text.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
             
@@ -605,6 +622,7 @@ class LevelManager:
             if physics.check_water_collision(player, water_hitbox):
                 self.is_dying = True
                 self.death_timer = 30  # Half second death animation
+                self.death_sound.play()  # Play death sound
             
             # Check portal collision (level complete)
             if player.rect.colliderect(portal_rect):
@@ -633,6 +651,9 @@ class LevelManager:
             screen.blit(death_text, text_rect)
         
         if self.level_complete:
+            if not self.level_complete_sound_played:
+                self.win_sound.play()  # Play win sound
+                self.level_complete_sound_played = True
             if self.font is None:
                 self.font = pygame.font.Font(None, 72)
             win_text = self.font.render("Level 2 Finished!", True, (100, 255, 100))
@@ -788,11 +809,13 @@ class LevelManager:
             if physics.check_water_collision(player, water_hitbox):
                 self.is_dying = True
                 self.death_timer = 30
+                self.death_sound.play()  # Play death sound
             
             # Check evil tux collision (death)
             if player.rect.colliderect(evil_tux_rect):
                 self.is_dying = True
                 self.death_timer = 30
+                self.death_sound.play()  # Play death sound
             
             # Check portal collision (level complete)
             if player.rect.colliderect(portal_rect):
@@ -823,6 +846,9 @@ class LevelManager:
             screen.blit(death_text, text_rect)
         
         if self.level_complete:
+            if not self.level_complete_sound_played:
+                self.win_sound.play()  # Play win sound
+                self.level_complete_sound_played = True
             if self.font is None:
                 self.font = pygame.font.Font(None, 72)
             win_text = self.font.render("Level 3 Finished!", True, (100, 255, 100))
@@ -987,11 +1013,13 @@ class LevelManager:
             if physics.check_water_collision(player, water_hitbox):
                 self.is_dying = True
                 self.death_timer = 30
+                self.death_sound.play()  # Play death sound
             
             # Check evil tux collision
             if player.rect.colliderect(evil_tux_rect):
                 self.is_dying = True
                 self.death_timer = 30
+                self.death_sound.play()  # Play death sound
             
             if player.rect.colliderect(portal_rect):
                 self.level_complete = True
@@ -1019,6 +1047,9 @@ class LevelManager:
             screen.blit(death_text, text_rect)
         
         if self.level_complete:
+            if not self.level_complete_sound_played:
+                self.win_sound.play()  # Play win sound
+                self.level_complete_sound_played = True
             if self.font is None:
                 self.font = pygame.font.Font(None, 72)
             win_text = self.font.render("Level 4 Finished!", True, (100, 255, 100))
@@ -1178,12 +1209,14 @@ class LevelManager:
             if physics.check_water_collision(player, water_hitbox):
                 self.is_dying = True
                 self.death_timer = 30
+                self.death_sound.play()  # Play death sound
             
             # Check collision with all enemies
             for enemy_rect in enemy_rects:
                 if player.rect.colliderect(enemy_rect):
                     self.is_dying = True
                     self.death_timer = 30
+                    self.death_sound.play()  # Play death sound
                     break
             
             if player.rect.colliderect(portal_rect):
@@ -1211,6 +1244,9 @@ class LevelManager:
             screen.blit(death_text, text_rect)
         
         if self.level_complete:
+            if not self.level_complete_sound_played:
+                self.win_sound.play()  # Play win sound
+                self.level_complete_sound_played = True
             if self.font is None:
                 self.font = pygame.font.Font(None, 72)
             win_text = self.font.render("GAME COMPLETE!", True, (255, 215, 0))
