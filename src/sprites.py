@@ -19,6 +19,7 @@ class Sprites(pygame.sprite.Sprite):
     def __init__(self, x=0, y=0, width=32, height=32, image=None, *groups):
         """Initialize a generic sprite with position, velocity, and image."""
         super().__init__(*groups)
+        # Floating-point position and velocity
         self.pos = pygame.math.Vector2(x, y)
         self.vel = pygame.math.Vector2(0, 0)
 
@@ -27,6 +28,7 @@ class Sprites(pygame.sprite.Sprite):
             image = pygame.Surface((width, height), pygame.SRCALPHA)
             image.fill((255, 255, 255, 255))
 
+        # Store the active image and update the rect
         self.image = image
         self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
 
@@ -74,12 +76,14 @@ class Player(Sprites):
         self.lives = 3
         self.speed = 310
         self.jump = 800
+        # Ability list can be extended by unlocks
         self.abilities = []
         self.on_ground = True
         self.on_ice = False  # Track if player is on ice platform
         self.spawn_x = x  # Store spawn position
         self.spawn_y = y
-        self.fish_collected_this_level = 0  # Track fish collected in current level attempt
+        # Track fish collected in current level attempt (resets on death)
+        self.fish_collected_this_level = 0
 
         # Load animation frames
         self.base = pygame.image.load("images/basetux.png").convert_alpha()
@@ -150,6 +154,7 @@ class Player(Sprites):
 
     def change_direction(self):
         """Swap sprite image based on current direction state."""
+        # Choose the frame based on direction state
         if self.direction == "normal":
             player_image = self.base
         elif self.direction == "right":
@@ -233,6 +238,7 @@ class Environment(Sprites):
         self.tut = data.TutorialData()
         self.screen = pygame.display.set_mode((1000, 600))
         self.clock = pygame.time.Clock()
+        # Current selection state for menu flow
         self.selection = ""
         
         # Lists for environment objects (reserved for future use)
@@ -334,6 +340,7 @@ class Environment(Sprites):
         pass
 
 class NPC(Sprites):
+    """Non-player character with dialogue and optional minigame."""
     def __init__(self):
         """Initialize a generic NPC with dialogue and hint text."""
         super().__init__(width=40, height=60)

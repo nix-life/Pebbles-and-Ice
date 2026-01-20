@@ -22,6 +22,7 @@ class Minigame:
     def check_minigame(self, minigame):
         """Start a minigame based on its string key."""
         # TODO: Add transition later for all minigames between level + minigame
+        # Dispatch to the requested minigame
         if minigame == "ice":
             IcePuzzle()
 
@@ -365,6 +366,7 @@ class IcePuzzle(Minigame):
             # Update hint timer
             self.hint_timer -= 1
             if self.hint_timer <= -self.hint_interval:
+                # Restart the hint cycle
                 self.hint_timer = self.hint_duration
             
             # Handle falling animation
@@ -412,6 +414,7 @@ class IcePuzzle(Minigame):
                 
                 elif event.type == pygame.MOUSEBUTTONDOWN and self.game_state == "playing":
                     if event.button == 1:  # Left click
+                        # Attempt a move to the clicked tile
                         clicked_tile = self.get_tile_at_pos(event.pos)
                         
                         if clicked_tile and self.is_valid_move(clicked_tile):
@@ -669,6 +672,7 @@ class BlizzardSurvival(Minigame):
             clock.tick(60)
             
             if not self.game_over:
+                # Update time-based counters while alive
                 self.game_time += 1
                 self.spawn_timer += 1
                 
@@ -715,7 +719,7 @@ class BlizzardSurvival(Minigame):
                 self.player_x += self.player_velocity_x
                 self.player_x = max(0, min(920, self.player_x))
 
-                # Update balls
+                # Update balls and check for collisions
                 self.update_balls()
 
                 # Check collision
@@ -724,6 +728,7 @@ class BlizzardSurvival(Minigame):
                     self.game_over = True
                     self.screen_shake = 10
             else:
+                # Let the game-over overlay fade in
                 self.game_over_timer += 1
 
             # Draw everything
@@ -909,6 +914,7 @@ class FishFrenzy(Minigame):
                 # Update fish positions
                 self.update_fish()
             else:
+                # Delay before showing the completion overlay
                 self.complete_timer += 1
 
             # Clear screen (sky blue background)
@@ -957,6 +963,7 @@ class FishFrenzy(Minigame):
                             self.complete_timer = 0
                 elif event.type == pygame.MOUSEBUTTONDOWN and not self.game_complete:
                     if event.button == 1:  # Left mouse button
+                        # Click to collect a fish
                         self.check_fish_click(event.pos)
 
 class LogicTrial(Minigame):
@@ -1160,6 +1167,7 @@ class LogicTrial(Minigame):
                     break
                 elif event.type == pygame.KEYDOWN:
                     if self.game_state == "playing":
+                        # Answer selection via number keys
                         if event.key == pygame.K_1:
                             self.handle_answer(0)
                         elif event.key == pygame.K_2:

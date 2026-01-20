@@ -23,6 +23,7 @@ class GameLevel:
     def __init__(self, save_data=None, start_level=1):
         """Initialize pygame, core systems, and start the main loop."""
         pygame.init()
+        # Fixed window size for all levels
         self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Pebbles and Ice")
 
@@ -30,6 +31,7 @@ class GameLevel:
         self.player = Player(120, self.screen.get_height() - 200)
         self.physics = Physics()
         self.level_manager = LevelManager()
+        # Use existing save data if provided by menu; otherwise load defaults
         if save_data:
             self.save_data = save_data 
         else:
@@ -45,8 +47,10 @@ class GameLevel:
         # Frames remaining to display the "Game Saved!" message
         self.save_message_timer = 0
 
+        # Start the game loop immediately after setup
         self.loop()
 
+        # Cleanly shut down pygame when loop exits
         pygame.quit()
 
     def event_handling(self):
@@ -58,6 +62,7 @@ class GameLevel:
                 if event.key == pygame.K_s:
                     # Allow manual save during levels
                     if self.save_data.save_game():
+                        # 60 frames ≈ 1 second at 60 FPS
                         self.save_message_timer = 60  
             
         keys = pygame.key.get_pressed()
@@ -85,6 +90,7 @@ class GameLevel:
 
         while keep_going:
 
+            # Exit early if window closed
             if not self.event_handling():
                 keep_going = False
                 break
@@ -201,11 +207,13 @@ class GameLevel:
             elif self.current_state == "game_complete":
                 # Simple completion screen once all levels are cleared
                 self.screen.fill((20, 20, 40))
+                # Large title text
                 font = pygame.font.Font(None, 72)
                 text = font.render("Congratulations!", True, (255, 215, 0))
                 text_rect = text.get_rect(center=(500, 250))
                 self.screen.blit(text, text_rect)
                 
+                # Subtitle text
                 font2 = pygame.font.Font(None, 48)
                 text2 = font2.render("You completed all 5 levels!", True, (255, 255, 255))
                 text_rect2 = text2.get_rect(center=(500, 350))

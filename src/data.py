@@ -15,11 +15,13 @@ import pygame
 import logic 
 
 class Data:
+    """Base data class for shared save/data behaviors."""
     def __init__(self):
         """Base data class for shared save/data behaviors."""
         pass
 
 class PlayerStats(Data):
+    """UI helper for player stats screens and ability unlocks."""
     def __init__(self):
         """Initialize player stats UI state and unlocks."""
         pygame.init()
@@ -57,6 +59,7 @@ class PlayerStats(Data):
             
             # Draw input box
             input_box = pygame.Rect(250, 300, 500, 60)
+            # White fill for readability
             pygame.draw.rect(screen, (255, 255, 255), input_box)
             pygame.draw.rect(screen, (0, 0, 0), input_box, 3)
             
@@ -85,6 +88,7 @@ class PlayerStats(Data):
     
     def login_screen(self, screen, save_data):
         """Screen for returning players to login"""
+        # Username and password prompt in sequence
         username = self.get_text_input(screen, "Enter Username:")
         if username is None:
             return False
@@ -113,6 +117,7 @@ class PlayerStats(Data):
     
     def register_screen(self, screen, save_data):
         """Screen for new players to create account"""
+        # Block empty usernames/passwords
         username = self.get_text_input(screen, "Create Username:")
         if username is None or username == "":
             return False
@@ -149,6 +154,7 @@ class PlayerStats(Data):
         confirmation = ["Yes", "No"]
 
         for i in range(2):
+            # Two option buttons: Yes / No
             x = 240 + i * 400
             y = 275
             confirmation_num = i + 1
@@ -168,7 +174,22 @@ class PlayerStats(Data):
                 elif self.boxes[2].collidepoint(event.pos): 
                     return "new"
 
+        # No selection made yet
         return None
+
+class AchivementData(Data):
+    """Tracks achievements and minigame records (placeholder)."""
+    def __init__(self):
+        """Initialize achievement data container."""
+        super().__init__()
+
+    def unlock_achivements(self):
+        """Placeholder for achievement unlock logic."""
+        pass
+
+    def minigame_record(self):
+        """Placeholder for minigame record tracking."""
+        pass
 class SaveData(Data):
     """Persistent save data for a player profile."""
     SAVE_FILE = "savedata.txt"
@@ -177,7 +198,7 @@ class SaveData(Data):
         """Initialize default save fields for a new profile."""
         self.game_controller = logic.GameController()
         
-        # Default save data
+        # Default save data (also used when creating a new profile)
         self.username = ""
         self.password = ""
         self.player_name = ""
@@ -203,7 +224,7 @@ class SaveData(Data):
             lines = savefile.readlines()
             savefile.close()
             
-            # Find the user's section
+            # Find the user's section in the save file
             in_user_section = False
             for line in lines:
                 line = line.strip()
@@ -297,6 +318,7 @@ class SaveData(Data):
                 savefile.close()
 
         current_user_data = []
+        # Store values in a simple key=value format
         current_user_data.append("username = %s\n" % self.username)
         current_user_data.append("password = %s\n" % self.password)
         current_user_data.append("player_name = %s\n" % self.player_name)
@@ -321,6 +343,7 @@ class SaveData(Data):
         try:
             savefile = open(self.SAVE_FILE, "w")
             for username in all_users_data:
+                # Each user is stored in a [USER:username] section
                 savefile.write("[USER:%s]\n" % username)
                 for line in all_users_data[username]:
                     savefile.write(line)
@@ -447,6 +470,7 @@ class SaveData(Data):
         }
 
 class TutorialData(Data):
+    """Displays the tutorial overlay for new players."""
     def __init__(self):
         """Initialize tutorial data container."""
         super().__init__()

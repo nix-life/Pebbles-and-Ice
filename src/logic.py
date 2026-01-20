@@ -13,11 +13,13 @@ from data import PlayerStats
 from minigames import BlizzardSurvival
 from sprites import Player
 class Logic:
+    """Base logic class placeholder for shared logic utilities."""
     def __init__(self):
         """Base logic class placeholder."""
         pass
 
 class GameController:
+    """Handles level selection UI and menu interactions."""
     def __init__(self):
         """Initialize level selection controller state."""
         pygame.init()
@@ -30,6 +32,7 @@ class GameController:
     def update_game(self, screen, events, save_data=None):
         """Render level selection screen and handle selection input."""
     
+        # Fonts used for UI elements
         small_font = pygame.font.SysFont("verdana", 48, bold=True)
         title_font = pygame.font.SysFont("Helvetica", 72, bold=True)
         button_font = pygame.font.SysFont("verdana", 24, bold=True)
@@ -43,6 +46,7 @@ class GameController:
         if save_data:
             max_unlocked = save_data.highest_level_completed + 1
 
+        # Top row (levels 1-3)
         for i in range(3):
             x = 120 + i * 325
             y = 200
@@ -68,6 +72,7 @@ class GameController:
                 text_rect = text_surface.get_rect(center=(x + 62, y + 62))
                 screen.blit(text_surface, text_rect)
 
+        # Bottom row (levels 4-5)
         for i in range(2):
             x = 270 + i * 325
             y = 425
@@ -101,6 +106,7 @@ class GameController:
         stats_text_rect = stats_text.get_rect(center=self.view_stats_button.center)
         screen.blit(stats_text, stats_text_rect)
 
+        # Handle clicks on buttons/level boxes
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.view_stats_button and self.view_stats_button.collidepoint(event.pos):
@@ -202,6 +208,7 @@ class GameController:
         pass
 
 class Physics:
+    """Physics helper for gravity, friction, and collision resolution."""
     def __init__(self):
         """Initialize physics constants for gravity and friction."""
         self.gravity = 2000
@@ -211,6 +218,7 @@ class Physics:
 
     def apply_gravity(self, player, dt):
         """Apply gravity to a player using delta time."""
+        # Gravity affects vertical velocity every frame
         player.vel.y += self.gravity * dt
         if player.vel.y > self.max_fall_speed:
             player.vel.y = self.max_fall_speed
@@ -294,6 +302,7 @@ class Physics:
         return player.rect.colliderect(water_rect)
 
 class LevelManager:
+    """Loads and runs level logic, hazards, and enemy behavior."""
     def __init__(self):
         """Initialize level assets, enemy state, and timers."""
         self.water_x = 0
