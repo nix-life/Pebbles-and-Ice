@@ -150,7 +150,7 @@ class GameLevel:
                     # Save player position before minigame
                     saved_x = self.player.rect.x
                     saved_y = self.player.rect.y
-                    IcePuzzle()
+                    IcePuzzle(self.save_data)
                     # Restore player position after minigame
                     self.player.rect.x = saved_x
                     self.player.rect.y = saved_y
@@ -178,7 +178,7 @@ class GameLevel:
                     # Save player position before minigame
                     saved_x = self.player.rect.x
                     saved_y = self.player.rect.y
-                    LogicTrial()
+                    LogicTrial(self.save_data)
                     # Restore player position after minigame
                     self.player.rect.x = saved_x
                     self.player.rect.y = saved_y
@@ -214,7 +214,7 @@ class GameLevel:
                     # Save player position before minigame
                     saved_x = self.player.rect.x
                     saved_y = self.player.rect.y
-                    FishFrenzy()
+                    FishFrenzy(self.save_data)
                     # Restore player position after minigame
                     self.player.rect.x = saved_x
                     self.player.rect.y = saved_y
@@ -250,7 +250,7 @@ class GameLevel:
                     # Save player position before minigame
                     saved_x = self.player.rect.x
                     saved_y = self.player.rect.y
-                    BlizzardSurvival()
+                    BlizzardSurvival(self.save_data)
                     # Restore player position after minigame
                     self.player.rect.x = saved_x
                     self.player.rect.y = saved_y
