@@ -13,6 +13,7 @@ import pygame
 from sprites import Player, Environment
 from logic import Physics, LevelManager
 from data import SaveData
+from minigames import IcePuzzle, LogicTrial, FishFrenzy, BlizzardSurvival
 
 class GameLevel:
     """
@@ -145,7 +146,17 @@ class GameLevel:
                 
                 level2 = self.level_manager.level_2(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level2 == "done":
+                if level2 == "minigame_ice":
+                    # Save player position before minigame
+                    saved_x = self.player.rect.x
+                    saved_y = self.player.rect.y
+                    IcePuzzle()
+                    # Restore player position after minigame
+                    self.player.rect.x = saved_x
+                    self.player.rect.y = saved_y
+                    self.player.vel.x = 0
+                    self.player.vel.y = 0
+                elif level2 == "done":
                     # Advance state machine to the next level
                     self.current_state = "level_3"
                     self.level_manager.current_level = 3
@@ -163,7 +174,17 @@ class GameLevel:
             elif self.current_state == "level_3":
                 level3 = self.level_manager.level_3(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level3 == "done":
+                if level3 == "minigame_logic":
+                    # Save player position before minigame
+                    saved_x = self.player.rect.x
+                    saved_y = self.player.rect.y
+                    LogicTrial()
+                    # Restore player position after minigame
+                    self.player.rect.x = saved_x
+                    self.player.rect.y = saved_y
+                    self.player.vel.x = 0
+                    self.player.vel.y = 0
+                elif level3 == "done":
                     # Advance state machine to the next level
                     self.current_state = "level_4"
                     self.level_manager.current_level = 4
@@ -189,7 +210,17 @@ class GameLevel:
                 
                 level4 = self.level_manager.level_4(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level4 == "done":
+                if level4 == "minigame_fish":
+                    # Save player position before minigame
+                    saved_x = self.player.rect.x
+                    saved_y = self.player.rect.y
+                    FishFrenzy()
+                    # Restore player position after minigame
+                    self.player.rect.x = saved_x
+                    self.player.rect.y = saved_y
+                    self.player.vel.x = 0
+                    self.player.vel.y = 0
+                elif level4 == "done":
                     # Advance state machine to the next level
                     self.current_state = "level_5"
                     self.level_manager.current_level = 5
@@ -215,7 +246,17 @@ class GameLevel:
                 
                 level5 = self.level_manager.level_5(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
-                if level5 == "done":
+                if level5 == "minigame_blizzard":
+                    # Save player position before minigame
+                    saved_x = self.player.rect.x
+                    saved_y = self.player.rect.y
+                    BlizzardSurvival()
+                    # Restore player position after minigame
+                    self.player.rect.x = saved_x
+                    self.player.rect.y = saved_y
+                    self.player.vel.x = 0
+                    self.player.vel.y = 0
+                elif level5 == "done":
                     # Mark final completion and switch to final scene
                     self.save_data.complete_level(5)
                     self.current_state = "final_scene"
@@ -237,7 +278,7 @@ class GameLevel:
                 # Load domino image if not loaded
                 if self.domino_img is None:
                     self.domino_img = pygame.image.load("images/domino.png")
-                    self.domino_img = pygame.transform.smoothscale(self.domino_img, (60, 80))
+                    self.domino_img = pygame.transform.smoothscale(self.domino_img, (100, 100))
                 
                 # Create floor platform (entire width)
                 if self.final_scene_floor is None:
@@ -285,7 +326,7 @@ class GameLevel:
                         dialogue_lines = [
                             "Domino: You made it, my friend!",
                             "The perfect pebble, shaped by ice and time.",
-                            "Thank you for this precious gift!"
+                            "No matter how far the ice stretches, you'll always be my friend."
                         ]
                         
                         # Draw dialogue box

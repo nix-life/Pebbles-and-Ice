@@ -90,8 +90,6 @@ class IcePuzzle(Minigame):
 
         self.loop()
 
-        pygame.quit()
-
     def generate_path(self):
         """Generate a random path from left to right through the grid"""
         self.grid = []
@@ -167,8 +165,8 @@ class IcePuzzle(Minigame):
     def get_tile_at_pos(self, mouse_pos):
         """Get the grid position (col, row) at mouse position, or None"""
         mx, my = mouse_pos
-        col = (mx - self.grid_x) / self.tile_size
-        row = (my - self.grid_y) / self.tile_size
+        col = int((mx - self.grid_x) / self.tile_size)
+        row = int((my - self.grid_y) / self.tile_size)
         
         if 0 <= col < self.grid_cols and 0 <= row < self.grid_rows:
             return (col, row)
@@ -267,8 +265,8 @@ class IcePuzzle(Minigame):
                 # Add ice texture (simple lines)
                 if random.random() < 0.3:
                     crack_x = rect.x + random.randint(5, self.tile_size - 5)
-                    crack_y1 = rect.y + random.randint(5, self.tile_size / 2)
-                    crack_y2 = rect.y + random.randint(self.tile_size / 2, self.tile_size - 5)
+                    crack_y1 = rect.y + random.randint(5, self.tile_size // 2)
+                    crack_y2 = rect.y + random.randint(self.tile_size // 2, self.tile_size - 5)
                     pygame.draw.line(self.screen, (180, 210, 240), (crack_x, crack_y1), (crack_x, crack_y2), 1)
 
     def draw_player(self):
@@ -368,6 +366,39 @@ class IcePuzzle(Minigame):
         while keep_going:
             clock.tick(60)
             
+            # Handle events FIRST
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    keep_going = False
+                    break
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN and self.game_state == "playing":
+                    if event.button == 1:  # Left click
+                        # Attempt a move to the clicked tile
+                        clicked_tile = self.get_tile_at_pos(event.pos)
+                        
+                        if clicked_tile and self.is_valid_move(clicked_tile):
+                            # Check if it's a safe tile (part of the path)
+                            if self.grid[clicked_tile[1]][clicked_tile[0]] == 1:
+                                # Safe! Move to this tile
+                                self.previous_pos = self.player_pos
+                                self.player_pos = clicked_tile
+                                self.visited.append(clicked_tile)
+                                
+                                # Check for win
+                                if clicked_tile == self.path[-1]:
+                                    self.game_state = "won"
+                                    if not self.win_sound_played:
+                                        self.win_sound.play()  # Play win sound
+                                        self.win_sound_played = True
+                            else:
+                                # Fell through!
+                                self.player_pos = clicked_tile
+                                self.game_state = "falling"
+                                self.fall_timer = 0
+                                self.fall_offset = 0
+                                self.death_sound.play()  # Play death sound
+            
             # Update hint timer
             self.hint_timer -= 1
             if self.hint_timer <= -self.hint_interval:
@@ -411,38 +442,6 @@ class IcePuzzle(Minigame):
                 self.draw_game_over()
             
             pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    keep_going = False
-                    break
-                
-                elif event.type == pygame.MOUSEBUTTONDOWN and self.game_state == "playing":
-                    if event.button == 1:  # Left click
-                        # Attempt a move to the clicked tile
-                        clicked_tile = self.get_tile_at_pos(event.pos)
-                        
-                        if clicked_tile and self.is_valid_move(clicked_tile):
-                            # Check if it's a safe tile (part of the path)
-                            if self.grid[clicked_tile[1]][clicked_tile[0]] == 1:
-                                # Safe! Move to this tile
-                                self.previous_pos = self.player_pos
-                                self.player_pos = clicked_tile
-                                self.visited.append(clicked_tile)
-                                
-                                # Check for win
-                                if clicked_tile == self.path[-1]:
-                                    self.game_state = "won"
-                                    if not self.win_sound_played:
-                                        self.win_sound.play()  # Play win sound
-                                        self.win_sound_played = True
-                            else:
-                                # Fell through!
-                                self.player_pos = clicked_tile
-                                self.game_state = "falling"
-                                self.fall_timer = 0
-                                self.fall_offset = 0
-                                self.death_sound.play()  # Play death sound
 
 class BlizzardSurvival(Minigame):
     """Dodge falling snowballs for a time-based score."""
@@ -508,8 +507,6 @@ class BlizzardSurvival(Minigame):
         self.win_sound_played = False
 
         self.loop()
-
-        pygame.quit()
 
     def spawn_ball(self):
         """Create a new falling ball at the top of the screen"""
@@ -844,8 +841,6 @@ class FishFrenzy(Minigame):
 
         self.loop()
 
-        pygame.quit()
-
     def spawn_fish(self):
         """Create a new falling fish at the top of the screen"""
         fish = {
@@ -1039,7 +1034,6 @@ class LogicTrial(Minigame):
         self.win_sound_played = False
 
         self.loop()
-        pygame.quit()
 
     def draw_progress_bar(self):
         """Draw the quiz progress bar and question counter."""

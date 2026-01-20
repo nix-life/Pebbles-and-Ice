@@ -29,8 +29,8 @@ ice_puzzle_best_attempts = 0
 fish_frenzy_high_score = 0
 logic_trial_best_score = 0
 achievements = 
-total_deaths = 25
-total_playtime = 431.88
+total_deaths = 28
+total_playtime = 627.67
 
 [USER:h]
 username = h

@@ -10,7 +10,7 @@ things like gravity, jumping, collection, information and much more.
 # Import Modules
 import pygame
 from data import PlayerStats
-from minigames import BlizzardSurvival
+from minigames import FishFrenzy
 from sprites import Player
 class Logic:
     """Base logic class placeholder for shared logic utilities."""
@@ -196,18 +196,6 @@ class GameController:
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
                     waiting = False
-    
-    def start_game(self):
-        """Placeholder for start-game hook."""
-        pass
-
-    def end_game(self):
-        """Placeholder for end-game hook."""
-        pass
-
-    def load_level(self, level_number):
-        """Placeholder for loading a specific level by number."""
-        pass
 
 class Physics:
     """Physics helper for gravity, friction, and collision resolution."""
@@ -351,6 +339,16 @@ class LevelManager:
         self.death_sound = pygame.mixer.Sound("sound/death.wav")
         self.win_sound = pygame.mixer.Sound("sound/win.mp3")
         self.level_complete_sound_played = False  # Track if win sound has been played
+        
+        # Load NPC images
+        self.owl_img = pygame.image.load("images/owl.png").convert_alpha()
+        self.owl_img = pygame.transform.smoothscale(self.owl_img, (70, 70))
+        self.fox_img = pygame.image.load("images/fox.png").convert_alpha()
+        self.fox_img = pygame.transform.smoothscale(self.fox_img, (80, 60))
+        self.polar_bear_img = pygame.image.load("images/polar-bear.png").convert_alpha()
+        self.polar_bear_img = pygame.transform.smoothscale(self.polar_bear_img, (120, 105))
+        self.rabbit_img = pygame.image.load("images/rabbit.png").convert_alpha()
+        self.rabbit_img = pygame.transform.smoothscale(self.rabbit_img, (95, 100))
 
     def draw_lives(self, screen, player):
         """Draw life counter and heart icons."""
@@ -388,6 +386,7 @@ class LevelManager:
                 result = player.take_damage()
                 if result == "game_over":
                     # Reset lives and restart
+                    FishFrenzy()
                     player.reset_lives()
                 player.reset_position()
                 # Track death in save data
@@ -531,7 +530,11 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
-                    # Reset lives and restart
+                    screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
+                    
+                    # Draw text
+                    screen.blit(death_text, text_rect)
+                    FishFrenzy()
                     player.reset_lives()
                 player.reset_position()
                 # Track death in save data
@@ -552,11 +555,13 @@ class LevelManager:
         # Level 2: Harder layout with ice platforms and more gaps - watch your momentum!
         platforms = [
             {'img': big_platform, 'x': 50, 'y': 480, 'w': 200, 'h': 70, 'ice': False},
-            {'img': self.ice_platform_img, 'x': 280, 'y': 420, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
             {'img': small_platform, 'x': 200, 'y': 330, 'w': 120, 'h': 40, 'ice': False},
             {'img': self.ice_platform_img, 'x': 380, 'y': 250, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
             {'img': self.ice_platform_img, 'x': 600, 'y': 180, 'w': self.ice_platform_img.get_width(), 'h': self.ice_platform_img.get_height(), 'ice': True},
+            {'img': small_platform, 'x': 100, 'y': 160, 'w': 120, 'h': 40, 'ice': False},
             {'img': big_platform, 'x': 780, 'y': 120, 'w': 200, 'h': 70, 'ice': False},
+            # NPC platform in top-left corner
+            {'img': small_platform, 'x': 30, 'y': 100, 'w': 120, 'h': 40, 'ice': False, 'npc': 'owl'},
         ]
         
         # Create collision rects and identify ice platforms
@@ -599,9 +604,46 @@ class LevelManager:
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
         
+        # Draw owl NPC on its platform
+        owl_x = 0
+        owl_y = 0
+        for p in platforms:
+            if p.get('npc') == 'owl':
+                owl_x = p['x'] + (p['w'] / 2) - 25
+                owl_y = p['y'] - 50
+                screen.blit(self.owl_img, (owl_x, owl_y))
+        
+        # Check NPC proximity and show dialogue
+        owl_rect = pygame.Rect(owl_x, owl_y, 50, 50)
+        npc_near_owl = player.rect.colliderect(owl_rect.inflate(20, 20))
+        if npc_near_owl:  # 10 pixels on each side
+            dialogue_font = pygame.font.Font(None, 24)
+            dialogue_lines = [
+                "Owl: Hoo... every step matters on this frozen path.",
+                "Ice will carry you farther than you expect.",
+                "Observe before you move, and you will not fall.",
+                "Press E to start Ice Puzzle"
+            ]
+            # Draw dialogue box at top of screen
+            box_width = 500
+            box_height = len(dialogue_lines) * 30 + 20
+            box_x = (screen.get_width() - box_width) // 2
+            box_y = 20
+            pygame.draw.rect(screen, (0, 0, 0), (box_x, box_y, box_width, box_height), border_radius=5)
+            pygame.draw.rect(screen, (255, 215, 0), (box_x, box_y, box_width, box_height), 2, border_radius=5)
+            line_y = box_y + 10
+            for line in dialogue_lines:
+                text = dialogue_font.render(line, True, (255, 255, 255))
+                screen.blit(text, (box_x + 15, line_y))
+                line_y += 30
+            # Check for E key press to start minigame
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_e]:
+                return "minigame_ice"
+        
         # Draw portal on the highest platform (top right)
-        portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
-        portal_y = platforms[-1]['y'] - 100
+        portal_x = platforms[-2]['x'] + (platforms[-2]['w'] // 2) - 40
+        portal_y = platforms[-2]['y'] - 100
         portal_rect = pygame.Rect(portal_x, portal_y, 80, 100)
         screen.blit(self.portal_img, (portal_x, portal_y))
 
@@ -679,6 +721,7 @@ class LevelManager:
                 result = player.take_damage()
                 if result == "game_over":
                     # Reset lives and restart
+                    FishFrenzy()
                     player.reset_lives()
                 player.reset_position()
                 # Track death in save data
@@ -705,6 +748,9 @@ class LevelManager:
             {'img': tiny_platform, 'x': 340, 'y': 295, 'w': 85, 'h': 32, 'ice': False},
             {'img': medium_platform, 'x': 380, 'y': 165, 'w': 160, 'h': 35, 'ice': False, 'has_enemy': True},
             {'img': ice_small, 'x': 600, 'y': 100, 'w': 110, 'h': 38, 'ice': True},
+            {'img': medium_platform, 'x': 600, 'y': 450, 'w': 200, 'h': 70, 'ice': False},
+            # Fox NPC platform in bottom-right corner
+            {'img': small_platform, 'x': 850, 'y': 480, 'w': 110, 'h': 38, 'ice': False, 'npc': 'fox'},
             {'img': small_platform, 'x': 750, 'y': 90, 'w': 110, 'h': 38, 'ice': False},
         ]
         
@@ -758,6 +804,43 @@ class LevelManager:
         # Draw all platforms
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Draw fox NPC on its platform
+        fox_x = 0
+        fox_y = 0
+        for p in platforms:
+            if p.get('npc') == 'fox':
+                fox_x = p['x'] + (p['w'] // 2) - 30
+                fox_y = p['y'] - 45
+                screen.blit(self.fox_img, (fox_x, fox_y))
+        
+        # Check NPC proximity and show dialogue
+        fox_rect = pygame.Rect(fox_x, fox_y, 60, 45)
+        npc_near_fox = player.rect.colliderect(fox_rect.inflate(20, 20))
+        if npc_near_fox:  # 10 pixels on each side
+            dialogue_font = pygame.font.Font(None, 24)
+            dialogue_lines = [
+                "Fox: Heh... traveling all this way for a pebble?",
+                "Look where the ground shifts and the path isn't obvious.",
+                "Think smart, Tux. Ice favors the clever.",
+                "Press E to start Logic Trial"
+            ]
+            # Draw dialogue box at top of screen
+            box_width = 530
+            box_height = len(dialogue_lines) * 30 + 20
+            box_x = (screen.get_width() - box_width) // 2
+            box_y = 20
+            pygame.draw.rect(screen, (0, 0, 0), (box_x, box_y, box_width, box_height), border_radius=5)
+            pygame.draw.rect(screen, (255, 215, 0), (box_x, box_y, box_width, box_height), 2, border_radius=5)
+            line_y = box_y + 10
+            for line in dialogue_lines:
+                text = dialogue_font.render(line, True, (255, 255, 255))
+                screen.blit(text, (box_x + 15, line_y))
+                line_y += 30
+            # Check for E key press to start minigame
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_e]:
+                return "minigame_logic"
         
         # Update and draw evil tux
         if enemy_platform and not self.is_dying:
@@ -874,6 +957,7 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
+                    FishFrenzy()
                     player.reset_lives()
                 player.reset_position()
                 if save_data:
@@ -912,6 +996,9 @@ class LevelManager:
             {'img': ice_small, 'x': 280, 'y': 140, 'w': 110, 'h': 38, 'ice': True},
             {'img': tiny_platform, 'x': 450, 'y': 100, 'w': 80, 'h': 30, 'ice': False},
             {'img': ice_small, 'x': 600, 'y': 60, 'w': 110, 'h': 38, 'ice': True},
+            # Polar bear NPC platform in bottom-right corner
+            {'img': medium_platform, 'x': 820, 'y': 520, 'w': 150, 'h': 45, 'ice': False, 'npc': 'polar_bear'},
+            {'img': ice_small, 'x': 700, 'y': 440, 'w': 110, 'h': 38, 'ice': True},
             {'img': medium_platform, 'x': 780, 'y': 100, 'w': 150, 'h': 45, 'ice': False},
         ]
         
@@ -951,6 +1038,43 @@ class LevelManager:
         # Draw platforms
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Draw polar bear NPC on its platform
+        bear_x = 0
+        bear_y = 0
+        for p in platforms:
+            if p.get('npc') == 'polar_bear':
+                bear_x = p['x'] + (p['w'] // 2) - 35
+                bear_y = p['y'] - 55
+                screen.blit(self.polar_bear_img, (bear_x, bear_y))
+        
+        # Check NPC proximity and show dialogue
+        bear_rect = pygame.Rect(bear_x, bear_y, 70, 55)
+        npc_near_bear = player.rect.colliderect(bear_rect.inflate(20, 20))
+        if npc_near_bear:  # 10 pixels on each side
+            dialogue_font = pygame.font.Font(None, 24)
+            dialogue_lines = [
+                "Polar Bear: You want more fish? Then think harder.",
+                "Smarter choices mean better rewards.",
+                "A penguin who plans well earns enough to finish.",
+                "Press E to start Fish Frenzy"
+            ]
+            # Draw dialogue box at top of screen
+            box_width = 530
+            box_height = len(dialogue_lines) * 30 + 20
+            box_x = (screen.get_width() - box_width) // 2
+            box_y = 20
+            pygame.draw.rect(screen, (0, 0, 0), (box_x, box_y, box_width, box_height), border_radius=5)
+            pygame.draw.rect(screen, (255, 215, 0), (box_x, box_y, box_width, box_height), 2, border_radius=5)
+            line_y = box_y + 10
+            for line in dialogue_lines:
+                text = dialogue_font.render(line, True, (255, 255, 255))
+                screen.blit(text, (box_x + 15, line_y))
+                line_y += 30
+            # Check for E key press to start minigame
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_e]:
+                return "minigame_fish"
         
         # Find and initialize evil tux enemy
         enemy_platform = None
@@ -1072,6 +1196,7 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
+                    FishFrenzy()
                     player.reset_lives()
                     # Reset enemies on game over
                     self.level5_enemies_initialized = False
@@ -1100,12 +1225,13 @@ class LevelManager:
             {'img': ice_tiny, 'x': 400, 'y': 380, 'w': 110, 'h': 38, 'ice': True, 'enemy': False},
             {'img': medium_platform, 'x': 620, 'y': 320, 'w': 180, 'h': 45, 'ice': False, 'enemy': True, 'enemy_speed': 90},
             # Middle section - go back left and up
-            {'img': tiny_platform, 'x': 400, 'y': 250, 'w': 100, 'h': 35, 'ice': False, 'enemy': False},
-            {'img': small_platform, 'x': 175, 'y': 190, 'w': 120, 'h': 40, 'ice': False, 'enemy': False},  # Removed enemy
+            {'img': tiny_platform, 'x': 335, 'y': 250, 'w': 100, 'h': 35, 'ice': False, 'enemy': False},
+            {'img': small_platform, 'x': 175, 'y': 190, 'w': 120, 'h': 40, 'ice': False, 'enemy': False},  
             # Upper section - back right to portal
             {'img': ice_tiny, 'x': 380, 'y': 105, 'w': 110, 'h': 38, 'ice': True, 'enemy': False},
             {'img': medium_platform, 'x': 620, 'y': 165, 'w': 180, 'h': 45, 'ice': False, 'enemy': True, 'enemy_speed': 90},
-            # Final platform with portal
+            # Rabbit NPC platform in top-left corner
+            {'img': small_platform, 'x': 20, 'y': 100, 'w': 120, 'h': 40, 'ice': False, 'enemy': False, 'npc': 'rabbit'},
             {'img': small_platform, 'x': 850, 'y': 120, 'w': 120, 'h': 40, 'ice': False, 'enemy': False},
         ]
         
@@ -1161,6 +1287,43 @@ class LevelManager:
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
         
+        # Draw rabbit NPC on its platform
+        rabbit_x = 0
+        rabbit_y = 0
+        for p in platforms:
+            if p.get('npc') == 'rabbit':
+                rabbit_x = p['x'] + (p['w'] / 2) - 22
+                rabbit_y = p['y'] - 50
+                screen.blit(self.rabbit_img, (rabbit_x, rabbit_y))
+        
+        # Check NPC proximity and show dialogue
+        rabbit_rect = pygame.Rect(rabbit_x, rabbit_y, 45, 50)
+        npc_near_rabbit = player.rect.colliderect(rabbit_rect.inflate(20, 20))
+        if npc_near_rabbit:  # 10 pixels on each side
+            dialogue_font = pygame.font.Font(None, 24)
+            dialogue_lines = [
+                "Rabbit: Hey! You can't reach everything with one jump!",
+                "Learn the double jump, and you'll leap again in air.",
+                "Some platforms are impossible without it. Try it out!",
+                "Press E to start Dodging Game"
+            ]
+            # Draw dialogue box at top of screen
+            box_width = 560
+            box_height = len(dialogue_lines) * 30 + 20
+            box_x = (screen.get_width() - box_width) // 2
+            box_y = 20
+            pygame.draw.rect(screen, (0, 0, 0), (box_x, box_y, box_width, box_height), border_radius=5)
+            pygame.draw.rect(screen, (255, 215, 0), (box_x, box_y, box_width, box_height), 2, border_radius=5)
+            line_y = box_y + 10
+            for line in dialogue_lines:
+                text = dialogue_font.render(line, True, (255, 255, 255))
+                screen.blit(text, (box_x + 15, line_y))
+                line_y += 30
+            # Check for E key press to start minigame
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_e]:
+                return "minigame_blizzard"
+        
         # Update and draw all enemies
         enemy_rects = []
         if not self.is_dying:
@@ -1192,7 +1355,7 @@ class LevelManager:
             enemy_rects.append(pygame.Rect(int(enemy['x']), int(enemy['y']), 40, 60))
         
         # Draw portal on final platform
-        portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
+        portal_x = platforms[-1]['x'] + (platforms[-1]['w'] / 2) - 40
         portal_y = platforms[-1]['y'] - 100
         portal_rect = pygame.Rect(portal_x, portal_y, 80, 100)
         screen.blit(self.portal_img, (portal_x, portal_y))

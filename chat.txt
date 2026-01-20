@@ -22,7 +22,7 @@ Increase your harvesting intelligence, and you’ll collect more fish from the s
 Smarter choices mean better rewards.
 A penguin who plans well earns enough to finish the journey.”
 
-(Initiate Fish Collecting (Unlocks Intelligence))
+(Initiate Fish Collecting)
 
 
 
@@ -33,14 +33,13 @@ Learn the double jump, and you’ll leap again while still in the air.
 Some platforms and some pebbles are impossible without it.
 Try it out. You’ll feel lighter already!”
 
-(Initiates Dodging Game (Unlocks Double Jump))
+(Initiates Dodging Game)
 
 
 
 DOMINO
 “Tux… you brought me a pebble?
 It’s perfect. You remembered.
-Here—take these fish.
 No matter how far the ice stretches, you’ll always be my friend.”
 
 (Game End)

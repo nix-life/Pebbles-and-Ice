@@ -188,31 +188,6 @@ class Player(Sprites):
         """Reset life count to default."""
         self.lives = 3
 
-class Enemy(Sprites):
-    """
-    This class creates sprites for enemies against tux. They spawn
-    as red penguins, killing tux when it is touched.
-    """
-    def __init__(self):
-        """Initialize base enemy stats."""
-        super().__init__(width=40, height=40)
-        # Default values; specific enemies may override these
-        self.damage = 1
-        self.speed = 0
-        self.detection_range = 0
-
-    def hit_player(self, player):
-        """Handle collision with player (to be implemented by subclasses)."""
-        pass
-
-    def detect_player(self, player):
-        """Detect player within range (to be implemented by subclasses)."""
-        pass
-
-    def move(self):
-        """Move enemy (to be implemented by subclasses)."""
-        pass
-
 class Environment(Sprites):
     """
     This sprite includes all of the environment behind the scenes.

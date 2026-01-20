@@ -478,6 +478,7 @@ class TutorialData(Data):
                 "You are a penguin named Tux.",
                 "Your goal is to bring a pebble to your friend Domino.",
                 "Becarewful of the icy terrain and obstacles along the way!",
+                "If a level has a NPC, you will need to interact with them to proceed.",
                 "",
                 "Press any key or click to continue..."
             ]
