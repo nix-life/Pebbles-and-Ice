@@ -333,6 +333,14 @@ class LevelManager:
         self.portal_img = pygame.image.load("images/portal.png")
         self.portal_img = pygame.transform.smoothscale(self.portal_img, (80, 100))
         
+        # Fish collectible
+        self.fish_img = pygame.image.load("images/fish.png").convert_alpha()
+        self.fish_img = pygame.transform.smoothscale(self.fish_img, (40, 40))
+        
+        # Fish spawn state for each level (reset when level starts)
+        self.level_fish = []  # List of {'x': x, 'y': y, 'collected': False}
+        self.fish_initialized = False
+        
         # Evil tux enemy
         self.evil_tux_img = pygame.image.load("images/evil-penguin.png").convert_alpha()
         self.evil_tux_img = pygame.transform.smoothscale(self.evil_tux_img, (40, 60))
@@ -384,6 +392,92 @@ class LevelManager:
                 (heart_x + 8, 18)
             ])
 
+    def spawn_fish_on_platforms(self, platforms, num_fish=3):
+        """Spawn fish on random positions on or above platforms.
+        
+        Args:
+            platforms: List of platform dicts with x, y, w, h keys
+            num_fish: Number of fish to spawn
+        
+        Returns:
+            List of fish dicts with x, y, collected keys
+        """
+        import random
+        fish_list = []
+        
+        # Pick random platforms for fish (avoid duplicates if possible)
+        available_platforms = list(range(len(platforms)))
+        
+        for _ in range(num_fish):
+            if not available_platforms:
+                available_platforms = list(range(len(platforms)))
+            
+            plat_idx = random.choice(available_platforms)
+            available_platforms.remove(plat_idx)
+            plat = platforms[plat_idx]
+            
+            # Random x position on the platform
+            fish_x = plat['x'] + random.randint(10, max(10, plat['w'] - 50))
+            
+            # Fish can be on platform or floating above it (for jumping challenge)
+            height_options = [
+                plat['y'] - 50,   # On the platform
+                plat['y'] - 100,  # Slightly above (easy jump)
+                plat['y'] - 150,  # Higher above (harder jump)
+            ]
+            fish_y = random.choice(height_options)
+            
+            fish_list.append({'x': fish_x, 'y': fish_y, 'collected': False})
+        
+        return fish_list
+
+    def draw_and_update_fish(self, screen, player, save_data=None):
+        """Draw fish and check for player collection.
+        
+        Args:
+            screen: Pygame screen surface
+            player: Player object
+            save_data: Optional save data to update fish count
+        
+        Returns:
+            Number of fish collected this frame
+        """
+        # Don't draw fish if level is complete
+        if self.level_complete:
+            return 0
+        
+        collected_count = 0
+        fish_rect = pygame.Rect(0, 0, 40, 40)
+        
+        for fish in self.level_fish:
+            if not fish['collected']:
+                fish_rect.x = fish['x']
+                fish_rect.y = fish['y']
+                
+                # Draw the fish
+                screen.blit(self.fish_img, (fish['x'], fish['y']))
+                
+                # Check collision with player
+                if player.rect.colliderect(fish_rect):
+                    fish['collected'] = True
+                    collected_count += 1
+                    player.collect_fish()
+                    if save_data:
+                        save_data.add_fish()
+        
+        return collected_count
+
+    def draw_fish_count(self, screen, player):
+        """Draw the fish collection counter on screen."""
+        if self.font is None:
+            self.font = pygame.font.Font(None, 36)
+        
+        fish_text = self.font.render("Fish: " + str(player.fish_collected_this_level), True, (255, 200, 100))
+        bg_rect = pygame.Rect(screen.get_width() - fish_text.get_width() - 30, 10, fish_text.get_width() + 20, 35)
+        pygame.draw.rect(screen, (0, 0, 0), bg_rect, border_radius=5)
+        pygame.draw.rect(screen, (255, 200, 100), bg_rect, 2, border_radius=5)
+        screen.blit(fish_text, (screen.get_width() - fish_text.get_width() - 20, 15))
+
     def level_1(self, screen, physics, player, game_bg, clock, save_data=None):
         """Run and render level 1."""
         # Handle death animation
@@ -431,6 +525,11 @@ class LevelManager:
         for p in platforms:
             if p['ice']:
                 ice_platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
+        
+        # Initialize fish on platforms if not already done for this level attempt
+        if not self.fish_initialized:
+            self.level_fish = self.spawn_fish_on_platforms(platforms, num_fish=3)
+            self.fish_initialized = True
 
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
@@ -460,6 +559,15 @@ class LevelManager:
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
         
+        # Draw and update fish collectibles
+        if not self.is_dying:
+            self.draw_and_update_fish(screen, player, save_data)
+        else:
+            # Just draw fish without collection check when dying
+            for fish in self.level_fish:
+                if not fish['collected']:
+                    screen.blit(self.fish_img, (fish['x'], fish['y']))
+        
         # Draw portal on the highest platform
         portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
         portal_y = platforms[-1]['y'] - 100
@@ -482,12 +590,16 @@ class LevelManager:
             # Check portal collision (level complete)
             if player.rect.colliderect(portal_rect):
                 self.level_complete = True
+                self.fish_initialized = False  # Reset fish for next level
                 
 
         player.draw(screen)
         
         # Draw lives UI
         self.draw_lives(screen, player)
+        
+        # Draw fish count UI
+        self.draw_fish_count(screen, player)
         
         # Draw death message if dying
         if self.is_dying:
@@ -576,6 +688,11 @@ class LevelManager:
         for p in platforms:
             if p['ice']:
                 ice_platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
+        
+        # Initialize fish on platforms if not already done
+        if not self.fish_initialized:
+            self.level_fish = self.spawn_fish_on_platforms(platforms, num_fish=4)
+            self.fish_initialized = True
 
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
@@ -605,6 +722,14 @@ class LevelManager:
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
         
+        # Draw and update fish collectibles
+        if not self.is_dying:
+            self.draw_and_update_fish(screen, player, save_data)
+        else:
+            for fish in self.level_fish:
+                if not fish['collected']:
+                    screen.blit(self.fish_img, (fish['x'], fish['y']))
+        
         # Draw portal on the highest platform (top right)
         portal_x = platforms[-1]['x'] + (platforms[-1]['w'] // 2) - 40
         portal_y = platforms[-1]['y'] - 100
@@ -627,12 +752,16 @@ class LevelManager:
             # Check portal collision (level complete)
             if player.rect.colliderect(portal_rect):
                 self.level_complete = True
+                self.fish_initialized = False  # Reset fish for next level
                 
 
         player.draw(screen)
         
         # Draw lives UI
         self.draw_lives(screen, player)
+        
+        # Draw fish count UI
+        self.draw_fish_count(screen, player)
         
         # Draw death message if dying
         if self.is_dying:
@@ -735,6 +864,11 @@ class LevelManager:
             self.evil_tux_platform = enemy_platform
             self.evil_tux_x = enemy_platform['x']
             self.evil_tux_y = enemy_platform['y'] - 60
+        
+        # Initialize fish on platforms if not already done
+        if not self.fish_initialized:
+            self.level_fish = self.spawn_fish_on_platforms(platforms, num_fish=4)
+            self.fish_initialized = True
 
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
@@ -763,6 +897,9 @@ class LevelManager:
         # Draw all platforms
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Draw and update fish
+        self.draw_and_update_fish(screen, player, save_data)
         
         # Update and draw evil tux
         if enemy_platform and not self.is_dying:
@@ -822,12 +959,17 @@ class LevelManager:
                 self.level_complete = True
                 # Reset enemy for next time
                 self.evil_tux_platform = None
+                # Reset fish for next time
+                self.fish_initialized = False
                 
 
         player.draw(screen)
         
         # Draw lives UI
         self.draw_lives(screen, player)
+        
+        # Draw fish count UI
+        self.draw_fish_count(screen, player)
         
         # Draw death message if dying
         if self.is_dying:
@@ -928,6 +1070,11 @@ class LevelManager:
         for p in platforms:
             if p['ice']:
                 ice_platform_rects.append(pygame.Rect(p['x'], p['y'], p['w'], p['h']))
+        
+        # Initialize fish on platforms if not already done
+        if not self.fish_initialized:
+            self.level_fish = self.spawn_fish_on_platforms(platforms, num_fish=5)
+            self.fish_initialized = True
 
         # Invisible walls
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
@@ -955,6 +1102,9 @@ class LevelManager:
         # Draw platforms
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Draw and update fish
+        self.draw_and_update_fish(screen, player, save_data)
         
         # Find and initialize evil tux enemy
         enemy_platform = None
@@ -1025,6 +1175,8 @@ class LevelManager:
                 self.level_complete = True
                 # Reset enemy for next time
                 self.evil_tux_platform = None
+                # Reset fish for next time
+                self.fish_initialized = False
                 # Restore original jump height
                 player.jump = original_jump
         
@@ -1034,6 +1186,9 @@ class LevelManager:
 
         player.draw(screen)
         self.draw_lives(screen, player)
+        
+        # Draw fish count UI
+        self.draw_fish_count(screen, player)
         
         if self.is_dying:
             if self.font is None:
@@ -1135,6 +1290,11 @@ class LevelManager:
                     }
                     self.level5_enemies.append(enemy)
             self.level5_enemies_initialized = True
+        
+        # Initialize fish on platforms if not already done
+        if not self.fish_initialized:
+            self.level_fish = self.spawn_fish_on_platforms(platforms, num_fish=5)
+            self.fish_initialized = True
 
         # Invisible walls
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
@@ -1162,6 +1322,9 @@ class LevelManager:
         # Draw platforms
         for p in platforms:
             screen.blit(p['img'], (p['x'], p['y']))
+        
+        # Draw and update fish
+        self.draw_and_update_fish(screen, player, save_data)
         
         # Update and draw all enemies
         enemy_rects = []
@@ -1222,9 +1385,14 @@ class LevelManager:
             if player.rect.colliderect(portal_rect):
                 self.level_complete = True
                 self.level5_enemies_initialized = False
+                # Reset fish for next time
+                self.fish_initialized = False
 
         player.draw(screen)
         self.draw_lives(screen, player)
+        
+        # Draw fish count UI
+        self.draw_fish_count(screen, player)
         
         # Draw level indicator
         if self.font is None:
