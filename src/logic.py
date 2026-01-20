@@ -101,29 +101,18 @@ class GameController:
                     if save_data and save_data.highest_level_completed >= 1:
                         self.level = 2
                         return "start_game"
-                    else:
-                        print("Level 2 is locked - complete Level 1 first")
                 elif self.boxes[3].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 2:
                         self.level = 3
-                        print("Level 3 selected")
                         return "start_game"
-                    else:
-                        print("Level 3 is locked - complete Level 2 first")
                 elif self.boxes[4].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 3:
                         self.level = 4
-                        print("Level 4 selected")
                         return "start_game"
-                    else:
-                        print("Level 4 is locked - complete Level 3 first")
                 elif self.boxes[5].collidepoint(event.pos):
                     if save_data and save_data.highest_level_completed >= 4:
                         self.level = 5
-                        print("Level 5 selected")
                         return "start_game"
-                    else:
-                        print("Level 5 is locked - complete Level 4 first")
                     
     def display_stats_screen(self, screen, save_data):
         """Display player statistics in a popup overlay"""
@@ -201,7 +190,7 @@ class Physics:
         self.gravity = 2000
         self.max_fall_speed = 1600
         self.ground_friction = 1800
-        self.ice_friction = 30  # Very low friction for ice - player slides a lot
+        self.ice_friction = 200  # Low friction for ice - some sliding but more control
 
     def apply_gravity(self, player, dt):
         player.vel.y += self.gravity * dt
@@ -658,7 +647,7 @@ class LevelManager:
         platforms = [
             {'img': medium_platform, 'x': 30, 'y': 520, 'w': 160, 'h': 50, 'ice': False},
             {'img': ice_small, 'x': 360, 'y': 425, 'w': 110, 'h': 38, 'ice': True},
-            {'img': tiny_platform, 'x': 380, 'y': 285, 'w': 85, 'h': 32, 'ice': False},
+            {'img': tiny_platform, 'x': 340, 'y': 295, 'w': 85, 'h': 32, 'ice': False},
             {'img': medium_platform, 'x': 380, 'y': 165, 'w': 160, 'h': 35, 'ice': False, 'has_enemy': True},
             {'img': ice_small, 'x': 600, 'y': 100, 'w': 110, 'h': 38, 'ice': True},
             {'img': small_platform, 'x': 750, 'y': 90, 'w': 110, 'h': 38, 'ice': False},
@@ -841,7 +830,7 @@ class LevelManager:
 
         # Reduce jump height for level 4 only
         original_jump = player.jump
-        player.jump = 550  # Lower jump height
+        player.jump = 600  # Lower jump height
         
         # Level 4: Complex zigzag layout with enemy and slippery ice platforms
         ice_tiny = pygame.transform.scale(self.ice_platform_img, (80, 30))
@@ -854,7 +843,7 @@ class LevelManager:
             {'img': tiny_platform, 'x': 420, 'y': 410, 'w': 80, 'h': 30, 'ice': False},
             {'img': medium_platform, 'x': 580, 'y': 360, 'w': 150, 'h': 45, 'ice': False, 'has_enemy': True},
             # Now must go back left to continue up
-            {'img': ice_tiny, 'x': 420, 'y': 300, 'w': 80, 'h': 30, 'ice': True},
+            {'img': ice_tiny, 'x': 420, 'y': 280, 'w': 80, 'h': 30, 'ice': True},
             {'img': small_platform, 'x': 250, 'y': 250, 'w': 110, 'h': 38, 'ice': False},
             {'img': tiny_platform, 'x': 100, 'y': 190, 'w': 80, 'h': 30, 'ice': False},
             # Now go right again to reach portal - more ice!
