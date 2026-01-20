@@ -13,7 +13,7 @@ import pygame
 from sprites import Player, Environment
 from logic import Physics, LevelManager
 from data import SaveData
-from minigames import IcePuzzle, BlizzardSurvival, FishFrenzy, LogicTrial
+from minigames import IcePuzzle, FishFrenzy, LogicTrial, BlizzardSurvival
 
 class GameLevel:
     """
@@ -53,8 +53,9 @@ class GameLevel:
         self.final_scene_dialogue_timer = 0
         self.final_scene_floor = None
         self.domino_x = 900
-        self.domino_y = 480
+        self.domino_y = 440  # Adjusted for domino on platform
         self.domino_img = None
+        self.final_scene_started = False  # Track if we clicked the button
 
         # Start the game loop immediately after setup
         self.loop()
@@ -66,7 +67,8 @@ class GameLevel:
         """Process input events and update player movement intent."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return False
+                pygame.quit()
+                exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
                     # Allow manual save during levels
@@ -115,18 +117,22 @@ class GameLevel:
             self.save_data.add_playtime(dt)
 
             if self.current_state == "level_1":
-                # Each level_* method returns "done" when completed
+                # Each level_* method returns "done" when completed, "game_over" when all lives lost
                 level1 = self.level_manager.level_1(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
+                if level1 == "game_over":
+                    # Return to level selection
+                    return
+                
                 if level1 == "done":
+                    # Play Ice Puzzle minigame
+                    IcePuzzle(self.screen, self.save_data)
+                    
                     # Update save data
                     self.save_data.complete_level(1)
                     self.save_data.set_level_reached(2)
                     
-                    # Play minigame after level 1
-                    IcePuzzle(self.screen)
-                    
-                    # Return to home screen after minigame
+                    # Return to level selection
                     return
                 
             
@@ -137,15 +143,19 @@ class GameLevel:
                 
                 level2 = self.level_manager.level_2(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
+                if level2 == "game_over":
+                    # Return to level selection
+                    return
+                
                 if level2 == "done":
+                    # Play Fish Frenzy minigame
+                    FishFrenzy(self.screen, self.save_data)
+                    
                     # Update save data
                     self.save_data.complete_level(2)
                     self.save_data.set_level_reached(3)
                     
-                    # Play minigame after level 2
-                    BlizzardSurvival(self.screen)
-                    
-                    # Return to home screen after minigame
+                    # Return to level selection
                     return
 
             elif self.current_state == "level_3":
@@ -155,15 +165,19 @@ class GameLevel:
                 
                 level3 = self.level_manager.level_3(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
+                if level3 == "game_over":
+                    # Return to level selection
+                    return
+                
                 if level3 == "done":
+                    # Play Logic Trial minigame
+                    LogicTrial(self.screen, self.save_data)
+                    
                     # Update save data
                     self.save_data.complete_level(3)
                     self.save_data.set_level_reached(4)
                     
-                    # Play minigame after level 3
-                    FishFrenzy(self.screen)
-                    
-                    # Return to home screen after minigame
+                    # Return to level selection
                     return
 
             elif self.current_state =="level_4":
@@ -173,15 +187,19 @@ class GameLevel:
                 
                 level4 = self.level_manager.level_4(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
+                if level4 == "game_over":
+                    # Return to level selection
+                    return
+                
                 if level4 == "done":
+                    # Play Blizzard Survival minigame
+                    BlizzardSurvival(self.screen, self.save_data)
+                    
                     # Update save data
                     self.save_data.complete_level(4)
                     self.save_data.set_level_reached(5)
                     
-                    # Play minigame after level 4
-                    LogicTrial(self.screen)
-                    
-                    # Return to home screen after minigame
+                    # Return to level selection
                     return
 
             elif self.current_state =="level_5":
@@ -191,65 +209,55 @@ class GameLevel:
                 
                 level5 = self.level_manager.level_5(self.screen, self.physics, self.player, self.game_bg, self.clock, self.save_data)
 
+                if level5 == "game_over":
+                    # Return to level selection
+                    return
+                
                 if level5 == "done":
-                    # Mark final completion and switch to final scene
+                    # Mark final completion and switch to final scene button
                     self.save_data.complete_level(5)
+                    self.current_state = "final_scene_button"
+                    self.final_scene_started = False
+
+            elif self.current_state == "final_scene_button":
+                # Empty screen with "Final Scene" button
+                self.screen.fill((20, 20, 40))
+                
+                # Draw "Final Scene" button
+                font = pygame.font.Font(None, 72)
+                button_text = font.render("Final Scene", True, (255, 255, 255))
+                button_rect = button_text.get_rect(center=(500, 300))
+                
+                # Button background
+                button_bg = pygame.Rect(button_rect.x - 30, button_rect.y - 20, 
+                                       button_rect.width + 60, button_rect.height + 40)
+                pygame.draw.rect(self.screen, (60, 60, 100), button_bg, border_radius=15)
+                pygame.draw.rect(self.screen, (255, 215, 0), button_bg, 3, border_radius=15)
+                
+                self.screen.blit(button_text, button_rect)
+                
+                # Check for click on button
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_clicked = pygame.mouse.get_pressed()[0]
+                
+                if button_bg.collidepoint(mouse_pos) and mouse_clicked and not self.final_scene_started:
+                    self.final_scene_started = True
                     self.current_state = "final_scene"
-                    # Reset player for final scene (platform is at y=520, player is 60px tall)
-                    self.player.spawn_x = 100
-                    self.player.spawn_y = 460  # 520 - 60 = 460 to be on platform
-                    self.player.reset_position()
-                    self.player.reset_lives()
-                    self.player.vel.x = 0
-                    self.player.vel.y = 0
-                    # Initialize final scene
-                    self.final_scene_dialogue_started = False
-                    self.final_scene_dialogue_timer = 0
+                    # Initialize final scene - dialogue starts automatically
+                    self.final_scene_dialogue_started = True
+                    self.final_scene_dialogue_timer = pygame.time.get_ticks()
 
             elif self.current_state == "final_scene":
                 # Get delta time
                 dt = self.clock.tick(60) / 1000.0
                 
-                # Load domino image if not loaded
+                # Load domino image if not loaded - scale to fill screen
                 if self.domino_img is None:
                     self.domino_img = pygame.image.load("images/domino.png")
-                    self.domino_img = pygame.transform.smoothscale(self.domino_img, (60, 80))
+                    self.domino_img = pygame.transform.smoothscale(self.domino_img, (1000, 600))
                 
-                # Create floor platform (entire width)
-                if self.final_scene_floor is None:
-                    floor_img = pygame.image.load("images/big-platform.png")
-                    floor_img = pygame.transform.scale(floor_img, (1000, 80))
-                    self.final_scene_floor = {'img': floor_img, 'x': 0, 'y': 520, 'w': 1000, 'h': 80}
-                
-                # Apply physics to player
-                platform_rect = pygame.Rect(self.final_scene_floor['x'], self.final_scene_floor['y'], 
-                                           self.final_scene_floor['w'], self.final_scene_floor['h'])
-                self.physics.apply_gravity(self.player, dt)
-                self.player.update(dt)
-                self.physics.handle_collisions(self.player, [platform_rect], [])
-                self.physics.apply_friction(self.player, dt)
-                
-                # Draw background
-                self.screen.blit(self.game_bg, (0, 0))
-                
-                # Draw floor platform
-                self.screen.blit(self.final_scene_floor['img'], (self.final_scene_floor['x'], self.final_scene_floor['y']))
-                
-                # Draw player
-                self.player.draw(self.screen)
-                
-                # Draw lives counter to verify rendering
-                self.level_manager.draw_lives(self.screen, self.player)
-                
-                # Draw domino character at the end
-                self.screen.blit(self.domino_img, (self.domino_x, self.domino_y))
-                
-                # Check proximity to domino (20 pixels)
-                distance_to_domino = abs(self.player.rect.x - self.domino_x)
-                
-                if distance_to_domino <= 20 and not self.final_scene_dialogue_started:
-                    self.final_scene_dialogue_started = True
-                    self.final_scene_dialogue_timer = pygame.time.get_ticks()
+                # Draw domino fullscreen
+                self.screen.blit(self.domino_img, (0, 0))
                 
                 # Show dialogue
                 if self.final_scene_dialogue_started:

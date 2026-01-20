@@ -30,7 +30,7 @@ fish_frenzy_high_score = 0
 logic_trial_best_score = 0
 achievements = 
 total_deaths = 53
-total_playtime = 799.77
+total_playtime = 810.26
 
 [USER:h]
 username = h
@@ -243,4 +243,112 @@ logic_trial_best_score = 0
 achievements = 
 total_deaths = 28
 total_playtime = 219.57
+
+[USER:charlie]
+username = charlie
+password = shao
+player_name = 
+levels_reached = 1
+highest_level_completed = 0
+fish_collected = 0
+total_fish_ever = 0
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 0
+total_playtime = 0.00
+
+[USER:richard]
+username = richard
+password = liu
+player_name = 
+levels_reached = 1
+highest_level_completed = 0
+fish_collected = 0
+total_fish_ever = 0
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 0
+total_playtime = 0.00
+
+[USER:charlies]
+username = charlies
+password = shao
+player_name = 
+levels_reached = 2
+highest_level_completed = 1
+fish_collected = 0
+total_fish_ever = 0
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 1
+total_playtime = 19.93
+
+[USER:charliess]
+username = charliess
+password = shao
+player_name = 
+levels_reached = 5
+highest_level_completed = 4
+fish_collected = 0
+total_fish_ever = 0
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 7
+total_playtime = 121.67
+
+[USER:justins]
+username = justins
+password = tians
+player_name = 
+levels_reached = 1
+highest_level_completed = 0
+fish_collected = 0
+total_fish_ever = 0
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 1
+total_playtime = 10.74
+
+[USER:tests]
+username = tests
+password = a
+player_name = 
+levels_reached = 5
+highest_level_completed = 4
+blizzard_survival_best_time = 17.52
+ice_puzzle_best_attempts = 2
+fish_frenzy_high_score = 15
+logic_trial_best_score = 8
+achievements = 
+total_deaths = 12
+total_playtime = 187.08
+
+[USER:pp]
+username = pp
+password = p
+player_name = 
+levels_reached = 1
+highest_level_completed = 0
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 0
+fish_frenzy_high_score = 0
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 0
+total_playtime = 0.00
 

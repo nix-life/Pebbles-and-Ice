@@ -196,8 +196,6 @@ class SaveData(Data):
         self.player_name = ""
         self.levels_reached = 1
         self.highest_level_completed = 0
-        self.fish_collected = 0
-        self.total_fish_ever = 0
         self.blizzard_survival_best_time = 0.0
         self.ice_puzzle_best_attempts = 0
         self.fish_frenzy_high_score = 0
@@ -241,10 +239,6 @@ class SaveData(Data):
                         self.levels_reached = int(value)
                     elif key == "highest_level_completed":
                         self.highest_level_completed = int(value)
-                    elif key == "fish_collected":
-                        self.fish_collected = int(value)
-                    elif key == "total_fish_ever":
-                        self.total_fish_ever = int(value)
                     elif key == "blizzard_survival_best_time":
                         self.blizzard_survival_best_time = float(value)
                     elif key == "ice_puzzle_best_attempts":
@@ -310,8 +304,6 @@ class SaveData(Data):
         current_user_data.append("player_name = %s\n" % self.player_name)
         current_user_data.append("levels_reached = %d\n" % self.levels_reached)
         current_user_data.append("highest_level_completed = %d\n" % self.highest_level_completed)
-        current_user_data.append("fish_collected = %d\n" % self.fish_collected)
-        current_user_data.append("total_fish_ever = %d\n" % self.total_fish_ever)
         current_user_data.append("blizzard_survival_best_time = %.2f\n" % self.blizzard_survival_best_time)
         current_user_data.append("ice_puzzle_best_attempts = %d\n" % self.ice_puzzle_best_attempts)
         current_user_data.append("fish_frenzy_high_score = %d\n" % self.fish_frenzy_high_score)
@@ -463,8 +455,8 @@ class TutorialData(Data):
             screen.blit(overlay, (0, 0))
             
             # Display tutorial text
-            title_font = pygame.font.SysFont("verdana", 60, bold=True)
-            text_font = pygame.font.SysFont("verdana", 28)
+            title_font = pygame.font.SysFont("verdana", 45, bold=True)
+            text_font = pygame.font.SysFont("verdana", 23)
             
             title = title_font.render("TUTORIAL", True, (255, 255, 255))
             title_rect = title.get_rect(center=(500, 40))
@@ -478,18 +470,19 @@ class TutorialData(Data):
                 "You are a penguin named Tux.",
                 "Your goal is to bring a pebble to your friend Domino.",
                 "Be careful of the icy terrain and obstacles along the way!",
-                "If you lose all 3 lives in a level, you will have to restart it by playing the minigame.",
+                "If you lose all 3 lives in a level, you will have to",
+                "restart it by playing the minigame.",
                 "If a level has a NPC, you will need to interact with them to proceed.",
                 "",
                 "Press any key or click to continue..."
             ]
             
-            y_offset = 120
+            y_offset = 110
             for line in tutorial_lines:
                 text_surface = text_font.render(line, True, (255, 255, 255))
                 text_rect = text_surface.get_rect(center=(500, y_offset))
                 screen.blit(text_surface, text_rect)
-                y_offset += 50
+                y_offset += 35
             
             pygame.display.flip()
             clock.tick(60)

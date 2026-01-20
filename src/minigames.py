@@ -373,8 +373,8 @@ class IcePuzzle(Minigame):
             # Handle events FIRST
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    keep_going = False
-                    break
+                    pygame.quit()
+                    exit()
                 
                 elif event.type == pygame.MOUSEBUTTONDOWN and self.game_state == "playing":
                     if event.button == 1:  # Left click
@@ -796,11 +796,11 @@ class BlizzardSurvival(Minigame):
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    keep_going = False
-                    break
+                    pygame.quit()
+                    exit()
                 elif event.type == pygame.KEYDOWN and self.game_over:
                     time_survived = self.game_time / 60
-                    if time_survived >= 20:
+                    if time_survived >= 15:
                         # Can continue if minimum met
                         if event.key == pygame.K_SPACE:
                             if not self.win_sound_played:
@@ -843,7 +843,7 @@ class FishFrenzy(Minigame):
         # List to store falling fish
         self.falling_fish = []
         self.spawn_timer = 0
-        self.spawn_delay = random.randint(20, 150) # frames
+        self.spawn_delay = random.randint(10, 60) # frames - faster spawn rate
         
         # Score counter
         self.score = 0
@@ -917,7 +917,7 @@ class FishFrenzy(Minigame):
         
         if self.complete_timer > 20:
             # Check if player met minimum requirement
-            if self.score >= 25:
+            if self.score >= 15:
                 title_text = self.font_large.render("Success!", True, (100, 255, 100))
                 subtitle_text = self.font_medium.render("You caught enough fish!", True, (150, 255, 150))
                 title_color = (100, 255, 100)
@@ -930,11 +930,11 @@ class FishFrenzy(Minigame):
             self.screen.blit(subtitle_text, (500 - subtitle_text.get_width() / 2, 260))
             
             # Final score
-            score_text = self.font_medium.render("Final Score: %d / 25 minimum" % self.score, True, (255, 255, 255))
+            score_text = self.font_medium.render("Final Score: %d / 15 minimum" % self.score, True, (255, 255, 255))
             self.screen.blit(score_text, (500 - score_text.get_width() / 2, 340))
             
             # Continue or restart
-            if self.score >= 25:
+            if self.score >= 15:
                 continue_text = self.font_small.render("Press SPACE to continue", True, (200, 200, 200))
             else:
                 continue_text = self.font_small.render("Minimum not met - Press R to restart", True, (255, 100, 100))
@@ -968,16 +968,16 @@ class FishFrenzy(Minigame):
             self.draw_fish()
             
             # Draw score
-            if self.score >= 25:
+            if self.score >= 15:
                 score_color = (100, 255, 100)
             else:
                 score_color = (255, 255, 255)
-            score_text = self.font.render("Score: %s (min: 25)" % self.score, True, score_color)
+            score_text = self.font.render("Score: %s (min: 15)" % self.score, True, score_color)
             self.screen.blit(score_text, (10, 10))
             
             # Draw minimum requirement reminder
             if not self.game_complete:
-                reminder_text = self.font_small.render("Minimum 25 fish - Don't let any escape!", True, (100, 100, 100))
+                reminder_text = self.font_small.render("Minimum 15 fish - Don't let any escape!", True, (100, 100, 100))
                 self.screen.blit(reminder_text, (500 - reminder_text.get_width() / 2, 560))
             
             # Draw game complete screen if applicable
@@ -988,10 +988,10 @@ class FishFrenzy(Minigame):
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    keep_going = False
-                    break
+                    pygame.quit()
+                    exit()
                 elif event.type == pygame.KEYDOWN and self.game_complete:
-                    if self.score >= 25:
+                    if self.score >= 15:
                         # Can continue if minimum met
                         if event.key == pygame.K_SPACE:
                             if not self.win_sound_played:
@@ -1218,8 +1218,8 @@ class LogicTrial(Minigame):
             # Handle events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    keep_going = False
-                    break
+                    pygame.quit()
+                    exit()
                 elif event.type == pygame.KEYDOWN:
                     if self.game_state == "playing":
                         # Answer selection via number keys

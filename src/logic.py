@@ -350,6 +350,12 @@ class LevelManager:
         self.polar_bear_img = pygame.transform.smoothscale(self.polar_bear_img, (120, 105))
         self.rabbit_img = pygame.image.load("images/rabbit.png").convert_alpha()
         self.rabbit_img = pygame.transform.smoothscale(self.rabbit_img, (95, 100))
+        
+        # NPC talked flags (must talk to NPC before portal works)
+        self.talked_to_owl = False
+        self.talked_to_fox = False
+        self.talked_to_bear = False
+        self.talked_to_rabbit = False
 
     def reload_images(self):
         """Reload all level images after display mode change."""
@@ -414,9 +420,12 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
-                    # Reset lives and restart
+                    # Play FishFrenzy then return to level selection
                     FishFrenzy()
                     player.reset_lives()
+                    if save_data:
+                        save_data.add_death()
+                    return "game_over"
                 player.reset_position()
                 # Track death in save data
                 if save_data:
@@ -558,12 +567,12 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
-                    screen.blit(bg_surface, (text_rect.x - 20, text_rect.y - 10))
-                    
-                    # Draw text
-                    screen.blit(death_text, text_rect)
+                    # Play FishFrenzy then return to level selection
                     FishFrenzy()
                     player.reset_lives()
+                    if save_data:
+                        save_data.add_death()
+                    return "game_over"
                 player.reset_position()
                 # Track death in save data
                 if save_data:
@@ -644,12 +653,12 @@ class LevelManager:
         owl_rect = pygame.Rect(owl_x, owl_y, 50, 50)
         npc_near_owl = player.rect.colliderect(owl_rect.inflate(20, 20))
         if npc_near_owl:  # 10 pixels on each side
+            self.talked_to_owl = True
             dialogue_font = pygame.font.Font(None, 24)
             dialogue_lines = [
                 "Owl: Hoo... every step matters on this frozen path.",
                 "Ice will carry you farther than you expect.",
-                "Observe before you move, and you will not fall.",
-                "Press E to start Ice Puzzle"
+                "Observe before you move, and you will not fall."
             ]
             # Draw dialogue box at top of screen
             box_width = 500
@@ -663,10 +672,6 @@ class LevelManager:
                 text = dialogue_font.render(line, True, (255, 255, 255))
                 screen.blit(text, (box_x + 15, line_y))
                 line_y += 30
-            # Check for E key press to start minigame
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_e]:
-                return "minigame_ice"
         
         # Draw portal on the highest platform (top right)
         portal_x = platforms[-2]['x'] + (platforms[-2]['w'] // 2) - 40
@@ -687,10 +692,11 @@ class LevelManager:
                 self.death_timer = 30  # Half second death animation
                 self.death_sound.play()  # Play death sound
             
-            # Check portal collision (level complete)
-            if player.rect.colliderect(portal_rect):
+            # Check portal collision (level complete) - must talk to owl first
+            if player.rect.colliderect(portal_rect) and self.talked_to_owl:
                 self.level_complete = True
                 self.fish_initialized = False  # Reset fish for next level
+                self.talked_to_owl = False  # Reset for replay
                 if save_data:
                     save_data.save_game()
 
@@ -747,9 +753,12 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
-                    # Reset lives and restart
+                    # Play FishFrenzy then return to level selection
                     FishFrenzy()
                     player.reset_lives()
+                    if save_data:
+                        save_data.add_death()
+                    return "game_over"
                 player.reset_position()
                 # Track death in save data
                 if save_data:
@@ -844,12 +853,12 @@ class LevelManager:
         fox_rect = pygame.Rect(fox_x, fox_y, 60, 45)
         npc_near_fox = player.rect.colliderect(fox_rect.inflate(20, 20))
         if npc_near_fox:  # 10 pixels on each side
+            self.talked_to_fox = True
             dialogue_font = pygame.font.Font(None, 24)
             dialogue_lines = [
                 "Fox: Heh... traveling all this way for a pebble?",
                 "Look where the ground shifts and the path isn't obvious.",
-                "Think smart, Tux. Ice favors the clever.",
-                "Press E to start Logic Trial"
+                "Think smart, Tux. Ice favors the clever."
             ]
             # Draw dialogue box at top of screen
             box_width = 530
@@ -863,10 +872,6 @@ class LevelManager:
                 text = dialogue_font.render(line, True, (255, 255, 255))
                 screen.blit(text, (box_x + 15, line_y))
                 line_y += 30
-            # Check for E key press to start minigame
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_e]:
-                return "minigame_logic"
         
         # Update and draw evil tux
         if enemy_platform and not self.is_dying:
@@ -921,11 +926,12 @@ class LevelManager:
                 self.death_timer = 30
                 self.death_sound.play()  # Play death sound
             
-            # Check portal collision (level complete)
-            if player.rect.colliderect(portal_rect):
+            # Check portal collision (level complete) - must talk to fox first
+            if player.rect.colliderect(portal_rect) and self.talked_to_fox:
                 self.level_complete = True
                 # Reset enemy for next time
                 self.evil_tux_platform = None
+                self.talked_to_fox = False  # Reset for replay
                 if save_data:
                     save_data.save_game()  # Auto-save on level complete
                 
@@ -983,8 +989,12 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
+                    # Play FishFrenzy then return to level selection
                     FishFrenzy()
                     player.reset_lives()
+                    if save_data:
+                        save_data.add_death()
+                    return "game_over"
                 player.reset_position()
                 if save_data:
                     save_data.add_death()
@@ -1077,12 +1087,12 @@ class LevelManager:
         bear_rect = pygame.Rect(bear_x, bear_y, 70, 55)
         npc_near_bear = player.rect.colliderect(bear_rect.inflate(20, 20))
         if npc_near_bear:  # 10 pixels on each side
+            self.talked_to_bear = True
             dialogue_font = pygame.font.Font(None, 24)
             dialogue_lines = [
                 "Polar Bear: You want more fish? Then think harder.",
                 "Smarter choices mean better rewards.",
-                "A penguin who plans well earns enough to finish.",
-                "Press E to start Fish Frenzy"
+                "A penguin who plans well earns enough to finish."
             ]
             # Draw dialogue box at top of screen
             box_width = 530
@@ -1096,10 +1106,6 @@ class LevelManager:
                 text = dialogue_font.render(line, True, (255, 255, 255))
                 screen.blit(text, (box_x + 15, line_y))
                 line_y += 30
-            # Check for E key press to start minigame
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_e]:
-                return "minigame_fish"
         
         # Find and initialize evil tux enemy
         enemy_platform = None
@@ -1166,10 +1172,11 @@ class LevelManager:
                 self.death_timer = 30
                 self.death_sound.play()  # Play death sound
             
-            if player.rect.colliderect(portal_rect):
+            if player.rect.colliderect(portal_rect) and self.talked_to_bear:
                 self.level_complete = True
                 # Reset enemy for next time
                 self.evil_tux_platform = None
+                self.talked_to_bear = False  # Reset for replay
                 if save_data:
                     save_data.save_game()  # Auto-save on level complete
                 # Restore original jump height
@@ -1221,10 +1228,14 @@ class LevelManager:
                 self.is_dying = False
                 result = player.take_damage()
                 if result == "game_over":
+                    # Play FishFrenzy then return to level selection
                     FishFrenzy()
                     player.reset_lives()
                     # Reset enemies on game over
                     self.level5_enemies_initialized = False
+                    if save_data:
+                        save_data.add_death()
+                    return "game_over"
                 player.reset_position()
                 if save_data:
                     save_data.add_death()
@@ -1324,12 +1335,12 @@ class LevelManager:
         rabbit_rect = pygame.Rect(rabbit_x, rabbit_y, 45, 50)
         npc_near_rabbit = player.rect.colliderect(rabbit_rect.inflate(20, 20))
         if npc_near_rabbit:  # 10 pixels on each side
+            self.talked_to_rabbit = True
             dialogue_font = pygame.font.Font(None, 24)
             dialogue_lines = [
                 "Rabbit: Hey! You can't reach everything with one jump!",
                 "Learn the double jump, and you'll leap again in air.",
-                "Some platforms are impossible without it. Try it out!",
-                "Press E to start Dodging Game"
+                "Some platforms are impossible without it. Try it out!"
             ]
             # Draw dialogue box at top of screen
             box_width = 560
@@ -1343,10 +1354,6 @@ class LevelManager:
                 text = dialogue_font.render(line, True, (255, 255, 255))
                 screen.blit(text, (box_x + 15, line_y))
                 line_y += 30
-            # Check for E key press to start minigame
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_e]:
-                return "minigame_blizzard"
         
         # Update and draw all enemies
         enemy_rects = []
@@ -1404,9 +1411,10 @@ class LevelManager:
                     self.death_sound.play()  # Play death sound
                     break
             
-            if player.rect.colliderect(portal_rect):
+            if player.rect.colliderect(portal_rect) and self.talked_to_rabbit:
                 self.level_complete = True
                 self.level5_enemies_initialized = False
+                self.talked_to_rabbit = False  # Reset for replay
                 if save_data:
                     save_data.save_game()  # Auto-save on level complete
 
