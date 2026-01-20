@@ -20,8 +20,8 @@ total_playtime = 0.00
 username = anson
 password = anson
 player_name = 
-levels_reached = 3
-highest_level_completed = 2
+levels_reached = 4
+highest_level_completed = 3
 fish_collected = 0
 total_fish_ever = 0
 double_jump_unlocked = False
@@ -32,7 +32,7 @@ fish_frenzy_high_score = 0
 logic_trial_best_score = 0
 achievements = 
 total_deaths = 3
-total_playtime = 104.39
+total_playtime = 138.04
 
 [USER:h]
 username = h
