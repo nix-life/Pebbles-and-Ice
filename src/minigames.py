@@ -1,11 +1,26 @@
+"""
+Date: Janurary 19, 2026
+Author: Charlie Shao and Anson Xiao
+Description:
+
+This file creates all of the minigames for the actual game. It 
+has four different minigames: IcePuzzle() which is a puzzle game,
+BlizzardSurvival() where you dodge incoming balls, FishFrenzy()
+where you click on fish and get points, and LogicTrial() where
+you get quizzed on information.
+"""
+
 import pygame
 import random
 
 class Minigame:
+    """Base class for launching minigame screens."""
     def __init__(self):
+        """Initialize shared minigame state (placeholder)."""
         pass
 
     def check_minigame(self, minigame):
+        """Start a minigame based on its string key."""
         # TODO: Add transition later for all minigames between level + minigame
         if minigame == "ice":
             IcePuzzle()
@@ -20,7 +35,9 @@ class Minigame:
             LogicTrial()
 
 class IcePuzzle(Minigame):
+    """Tile-based memory puzzle: find the safe ice path."""
     def __init__(self):
+        """Initialize the ice puzzle grid, state, and loop."""
         super().__init__()
 
         pygame.init()
@@ -338,6 +355,7 @@ class IcePuzzle(Minigame):
                 self.screen.blit(stats_text, (500 - stats_text.get_width() / 2, 330))
 
     def loop(self):
+        """Run the main loop for the ice puzzle minigame."""
         clock = pygame.time.Clock()
         keep_going = True
 
@@ -415,7 +433,9 @@ class IcePuzzle(Minigame):
                                 self.fall_offset = 0
 
 class BlizzardSurvival(Minigame):
+    """Dodge falling snowballs for a time-based score."""
     def __init__(self):
+        """Initialize blizzard survival assets, state, and loop."""
         super().__init__()
 
         pygame.init()
@@ -641,6 +661,7 @@ class BlizzardSurvival(Minigame):
         
 
     def loop(self):
+        """Run the main loop for blizzard survival."""
         clock = pygame.time.Clock()
         keep_going = True
 
@@ -764,7 +785,9 @@ class BlizzardSurvival(Minigame):
                             self.player_velocity_x = 0
 
 class FishFrenzy(Minigame):
+    """Click falling fish before any escape."""
     def __init__(self):
+        """Initialize fish frenzy assets, state, and loop."""
         super().__init__()
 
         pygame.init()
@@ -828,6 +851,7 @@ class FishFrenzy(Minigame):
             self.screen.blit(rotated_fish, fish_rect)
     
     def check_fish_click(self, mouse_pos):
+        """Handle clicking on a fish to score points."""
         for fish in self.falling_fish[:]:
             if fish['rect'].collidepoint(mouse_pos):
                 self.falling_fish.remove(fish)
@@ -868,6 +892,7 @@ class FishFrenzy(Minigame):
             self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 450))
 
     def loop(self):
+        """Run the main loop for fish frenzy."""
         clock = pygame.time.Clock()
         keep_going = True
 
@@ -935,7 +960,9 @@ class FishFrenzy(Minigame):
                         self.check_fish_click(event.pos)
 
 class LogicTrial(Minigame):
+    """Multiple-choice quiz minigame with pass/fail logic."""
     def __init__(self):
+        """Initialize quiz questions, visuals, and loop."""
         pygame.init()
         self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Logic Trial - Animal Quiz")
@@ -976,6 +1003,7 @@ class LogicTrial(Minigame):
         pygame.quit()
 
     def draw_progress_bar(self):
+        """Draw the quiz progress bar and question counter."""
         bar_width = 600
         bar_height = 30
         bar_x = (1000 - bar_width) / 2
@@ -993,6 +1021,7 @@ class LogicTrial(Minigame):
         self.screen.blit(progress_text, (bar_x + bar_width / 2 - progress_text.get_width() / 2, bar_y + 35))
 
     def draw_question(self):
+        """Render the current question and its answer options."""
         if self.current_question >= len(self.questions):
             return
 
@@ -1061,6 +1090,7 @@ class LogicTrial(Minigame):
 
 
     def draw_feedback(self):
+        """Show correct/incorrect feedback between questions."""
         if self.game_state == "correct":
             text = self.title_font.render("Correct!", True, self.correct_color)
         elif self.game_state == "wrong":
@@ -1072,6 +1102,7 @@ class LogicTrial(Minigame):
         self.screen.blit(text, text_rect)
 
     def draw_results(self):
+        """Draw the final results screen and grading message."""
         # Final score screen
         title = self.title_font.render("Quiz Complete!", True, self.text_color)
         self.screen.blit(title, (500 - title.get_width() / 2, 150))
@@ -1100,6 +1131,7 @@ class LogicTrial(Minigame):
         self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 450))
 
     def handle_answer(self, answer_index):
+        """Process the user's selected answer and update state."""
         if self.game_state != "playing":
             return
             
@@ -1114,6 +1146,7 @@ class LogicTrial(Minigame):
         self.feedback_timer = 60  
 
     def loop(self):
+        """Run the main loop for the logic trial quiz."""
         clock = pygame.time.Clock()
         keep_going = True
 

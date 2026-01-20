@@ -1,12 +1,29 @@
+"""
+Date: Janurary 19, 2026
+Authors: Charlie Shao and Anxon Xiao
+Description:
+This file creates sprites and objects for pebbles and ice. 
+It includes many different sprites, including the main character, 
+the platforms and npcs, and much more. Each sprites has its own characteristics,
+described in its method.
+"""
+
+# Import module
 import pygame
 
 class Sprites(pygame.sprite.Sprite):
+    """
+    This class creates an parent class for all other sprites. Everything
+    is connected to this class.
+    """
     def __init__(self, x=0, y=0, width=32, height=32, image=None, *groups):
+        """Initialize a generic sprite with position, velocity, and image."""
         super().__init__(*groups)
         self.pos = pygame.math.Vector2(x, y)
         self.vel = pygame.math.Vector2(0, 0)
 
         if image is None:
+            # Create a default placeholder surface if no image is provided
             image = pygame.Surface((width, height), pygame.SRCALPHA)
             image.fill((255, 255, 255, 255))
 
@@ -14,31 +31,45 @@ class Sprites(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
 
     def update(self, dt=0.0):
+        """Update position based on velocity and delta time."""
         self.pos.x += self.vel.x * dt
         self.pos.y += self.vel.y * dt
         self.rect.topleft = (int(self.pos.x), int(self.pos.y))
 
     def draw(self, surface):
+        """Draw sprite to the given surface."""
         surface.blit(self.image, self.rect)
 
     def velocity(self):
+        """Return current velocity vector."""
         return self.vel
 
     def position(self):
+        """Return current position vector."""
         return self.pos
 
     def set_position(self, x, y):
+        """Set position and update rect."""
         self.pos.update(x, y)
         self.rect.topleft = (int(self.pos.x), int(self.pos.y))
 
     def set_velocity(self, vx, vy):
+        """Set velocity vector."""
         self.vel.update(vx, vy)
 
 class Player(Sprites):
+    """
+    This class defines and initializes all information for the main
+    character tux. It includes the image, health, speed, jump power, 
+    abilities, gravity and much more.
+    """
     def __init__(self, x=120, y=120):
+        """Initialize player sprite, movement stats, and animation frames."""
+        # Load base player sprite
         player_image = pygame.image.load("images/basetux.png").convert_alpha()
         player_image = pygame.transform.smoothscale(player_image, (40, 60))
         super().__init__(x=x, y=y, width=40, height=60, image=player_image)
+        # Core player stats and movement settings
         self.health = 3
         self.lives = 3
         self.speed = 310
@@ -50,6 +81,7 @@ class Player(Sprites):
         self.spawn_y = y
         self.fish_collected_this_level = 0  # Track fish collected in current level attempt
 
+        # Load animation frames
         self.base = pygame.image.load("images/basetux.png").convert_alpha()
         self.base = pygame.transform.smoothscale(self.base, (40, 60))
 
@@ -63,6 +95,7 @@ class Player(Sprites):
         self.falling_tux = pygame.transform.smoothscale(self.falling_tux, (60, 60))
 
     def movement(self, keys):
+        """Handle player input and apply movement intent to velocity."""
         # Check if on ice - sliding movement with momentum
         if self.on_ice and self.on_ground:
             # On ice: gradual acceleration, player slides and keeps momentum
@@ -90,6 +123,7 @@ class Player(Sprites):
                     self.vel.x = 0
 
         if (keys[pygame.K_w] or keys[pygame.K_SPACE]) and self.on_ground:
+            # Only allow jumps when grounded
             self.vel.y = -self.jump
             self.on_ground = False
 
@@ -97,6 +131,7 @@ class Player(Sprites):
         self.update_sprite()
 
     def update_sprite(self):
+        """Select animation frame based on current velocity state."""
         # Use velocity check to prevent glitching
         if abs(self.vel.y) > 50:
             # Falling or jumping with significant velocity
@@ -114,6 +149,7 @@ class Player(Sprites):
         self.change_direction()
 
     def change_direction(self):
+        """Swap sprite image based on current direction state."""
         if self.direction == "normal":
             player_image = self.base
         elif self.direction == "right":
@@ -127,12 +163,14 @@ class Player(Sprites):
         self.rect = self.image.get_rect(topleft=(int(self.pos.x), int(self.pos.y)))
 
     def take_damage(self):
+        """Reduce life count and return state transition string."""
         self.lives -= 1
         if self.lives <= 0:
             return "game_over"
         return "respawn"
 
     def reset_position(self):
+        """Return player to spawn position and reset movement state."""
         self.pos.x = self.spawn_x
         self.pos.y = self.spawn_y
         self.rect.topleft = (int(self.pos.x), int(self.pos.y))
@@ -142,6 +180,7 @@ class Player(Sprites):
         self.on_ice = False
 
     def reset_lives(self):
+        """Reset life count to default."""
         self.lives = 3
     
     def reset_fish_count(self):
@@ -153,26 +192,41 @@ class Player(Sprites):
         self.fish_collected_this_level += 1
 
 class Enemy(Sprites):
+    """
+    This class creates sprites for enemies against tux. They spawn
+    as red penguins, killing tux when it is touched.
+    """
     def __init__(self):
+        """Initialize base enemy stats."""
         super().__init__(width=40, height=40)
+        # Default values; specific enemies may override these
         self.damage = 1
         self.speed = 0
         self.detection_range = 0
 
     def hit_player(self, player):
+        """Handle collision with player (to be implemented by subclasses)."""
         pass
 
     def detect_player(self, player):
+        """Detect player within range (to be implemented by subclasses)."""
         pass
 
     def move(self):
+        """Move enemy (to be implemented by subclasses)."""
         pass
 
 class Environment(Sprites):
+    """
+    This sprite includes all of the environment behind the scenes.
+    It includes the main level screens and main screen that is loaded.
+    """
     def __init__(self):
+        """Initialize main menu environment and assets."""
         import logic, data
         pygame.init()
         pygame.display.set_caption("Pebbles and Ice")
+        # Load/save handlers and controllers
         self.loading = data.PlayerStats()
         self.load_data = data.SaveData()
         self.game_control = logic.GameController()
@@ -181,9 +235,11 @@ class Environment(Sprites):
         self.clock = pygame.time.Clock()
         self.selection = ""
         
+        # Lists for environment objects (reserved for future use)
         self.platforms_list = []
         self.hazards_list = []
         
+        # Menu/background images
         self.before = pygame.image.load("images/mainloading-beforeclick.png")
         self.clicked = pygame.image.load("images/mainloading-clicked.png")
         self.game_bg = pygame.image.load("images/game-background.png")
@@ -195,7 +251,7 @@ class Environment(Sprites):
         self.starting()
 
     def starting(self):
-        """Main enter screen - shows loading screen with button"""
+        """Main enter screen - shows loading screen with button."""
         self.current_bg = self.before
         self.button_rect = pygame.Rect(405, 462, 150, 53)
         clicked_button = False
@@ -210,24 +266,27 @@ class Environment(Sprites):
                     return
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self.button_rect.collidepoint(event.pos) and not clicked_button:
+                        # Visual feedback when the start button is pressed
                         self.current_bg = self.clicked
                 elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                    # Start the transition once the mouse is released
                     clicked_button = True
                     flash_timer = 0.4
 
             self.screen.blit(self.current_bg, (0, 0))
             
             if clicked_button and flash_timer > 0:
+                # Short flash delay before moving to the next screen
                 flash_timer -= dt
             elif clicked_button and flash_timer <= 0:
-                """Move to returning player screen"""
+                # Move to returning player screen
                 result = self.loading.update_level(self.screen, self.events)
                 self.current_bg = self.game_bg
                 self.current_screen = "selection"
                 
                 # Handle returning player decision
                 if result == "returning":
-                    """Yes - Login required"""
+                    # Yes - login required
                     if self.loading.login_screen(self.screen, self.load_data):
                         self.level_selection_loop()
                         return
@@ -235,7 +294,7 @@ class Environment(Sprites):
                         clicked_button = False
                         self.current_bg = self.before
                 elif result == "new":
-                    """No - Create account and open tutorial"""
+                    # No - create account and open tutorial
                     if self.loading.register_screen(self.screen, self.load_data):
                         self.tut.load_tutorial(self.screen)
                         self.level_selection_loop()
@@ -248,7 +307,7 @@ class Environment(Sprites):
             pygame.display.flip()
 
     def level_selection_loop(self):
-        """temporary"""
+        """This includes all level loading information."""
         while True:
             self.events = pygame.event.get()
             for event in self.events:
@@ -257,27 +316,34 @@ class Environment(Sprites):
                     return
                 
             self.screen.blit(self.game_bg, (0, 0))
+            # Draw level selection UI and process clicks
             result = self.game_control.update_game(self.screen, self.events, self.load_data)
             if result == "start_game":
+                # Import locally to avoid circular imports
                 from main import GameLevel
                 GameLevel(save_data=self.load_data, start_level=self.game_control.level)
                 return
             pygame.display.flip()
 
     def platforms(self):
+        """Placeholder for future platform setup in the environment."""
         pass
 
     def update_environment(self):
+        """Placeholder for future environment updates."""
         pass
 
 class NPC(Sprites):
     def __init__(self):
+        """Initialize a generic NPC with dialogue and hint text."""
         super().__init__(width=40, height=60)
         self.dialogue = []
         self.hint = ""
 
     def talk(self):
+        """Placeholder for NPC dialogue interaction."""
         pass
 
     def start_minigame(self):
+        """Placeholder for launching an NPC minigame."""
         pass

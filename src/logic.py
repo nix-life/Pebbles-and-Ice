@@ -1,13 +1,25 @@
+"""
+Date: Janurary 19, 2026
+Author: Charlie Shao and Anson Xiao
+Description: 
+
+This program creates all of the logic behind the scenes. This includes
+things like gravity, jumping, collection, information and much more.
+"""
+
+# Import Modules
 import pygame
 from data import PlayerStats
 from minigames import BlizzardSurvival
 from sprites import Player
 class Logic:
     def __init__(self):
+        """Base logic class placeholder."""
         pass
 
 class GameController:
     def __init__(self):
+        """Initialize level selection controller state."""
         pygame.init()
         self.clock = pygame.time.Clock()
         self.boxes = {} 
@@ -16,6 +28,7 @@ class GameController:
         self.showing_stats = False
 
     def update_game(self, screen, events, save_data=None):
+        """Render level selection screen and handle selection input."""
     
         small_font = pygame.font.SysFont("verdana", 48, bold=True)
         title_font = pygame.font.SysFont("Helvetica", 72, bold=True)
@@ -188,27 +201,33 @@ class GameController:
                     waiting = False
     
     def start_game(self):
+        """Placeholder for start-game hook."""
         pass
 
     def end_game(self):
+        """Placeholder for end-game hook."""
         pass
 
     def load_level(self, level_number):
+        """Placeholder for loading a specific level by number."""
         pass
 
 class Physics:
     def __init__(self):
+        """Initialize physics constants for gravity and friction."""
         self.gravity = 2000
         self.max_fall_speed = 1600
         self.ground_friction = 1800
         self.ice_friction = 30  # Very low friction for ice - player slides a lot
 
     def apply_gravity(self, player, dt):
+        """Apply gravity to a player using delta time."""
         player.vel.y += self.gravity * dt
         if player.vel.y > self.max_fall_speed:
             player.vel.y = self.max_fall_speed
 
     def apply_friction(self, player, dt, surface_friction=None):
+        """Apply horizontal friction when grounded and not actively moving."""
         # Only apply friction when on ground
         if not getattr(player, "on_ground", False):
             return
@@ -230,6 +249,7 @@ class Physics:
             player.vel.x = min(0, player.vel.x + friction * dt)
 
     def handle_collisions(self, player, platforms, ice_platforms=None):
+        """Resolve collisions and set grounded/ice state."""
         if ice_platforms is None:
             ice_platforms = []
         
@@ -281,10 +301,12 @@ class Physics:
                     player.vel.x = 0
 
     def check_water_collision(self, player, water_rect):
+        """Return True if the player collides with water."""
         return player.rect.colliderect(water_rect)
 
 class LevelManager:
     def __init__(self):
+        """Initialize level assets, enemy state, and timers."""
         self.water_x = 0
         self.font = None  # Will be initialized when needed
         self.current_level = 1
@@ -326,6 +348,7 @@ class LevelManager:
         self.feedback_timer = 0
 
     def draw_lives(self, screen, player):
+        """Draw life counter and heart icons."""
         if self.font is None:
             self.font = pygame.font.Font(None, 36)
         
@@ -351,6 +374,7 @@ class LevelManager:
             ])
 
     def level_1(self, screen, physics, player, game_bg, clock, save_data=None):
+        """Run and render level 1."""
         # Handle death animation
         if self.is_dying:
             self.death_timer -= 1
@@ -489,6 +513,7 @@ class LevelManager:
 
 
     def level_2(self, screen, physics, player, game_bg, clock, save_data=None):
+        """Run and render level 2."""
         # Handle death animation
         if self.is_dying:
             self.death_timer -= 1
@@ -630,6 +655,7 @@ class LevelManager:
                 return "done"
 
     def level_3(self, screen, physics, player, game_bg, clock, save_data=None):
+        """Run and render level 3 with enemy patrol."""
         # Handle death animation
         if self.is_dying:
             self.death_timer -= 1
@@ -819,6 +845,7 @@ class LevelManager:
                 return "done"
 
     def level_4(self, screen, physics, player, game_bg, clock, save_data=None):
+        """Run and render level 4 with lower jump and enemy patrol."""
         # Handle death animation
         if self.is_dying:
             self.death_timer -= 1
@@ -1010,6 +1037,7 @@ class LevelManager:
                 return "done"
 
     def level_5(self, screen, physics, player, game_bg, clock, save_data=None):
+        """Run and render the final level with multiple enemies."""
         # Handle death animation
         if self.is_dying:
             self.death_timer -= 1
@@ -1201,10 +1229,12 @@ class LevelManager:
                 return "done"
 
     def check_level_completion(self):
+        """Unlock abilities based on current level milestone."""
         if self.level > 1:
             PlayerStats.unlock_ability(self.level)
         elif self.level > 3:
             PlayerStats.unlock_ability(self.level)
 
     def unlock_ability(self):
+        """Placeholder for manual ability unlocks."""
         pass

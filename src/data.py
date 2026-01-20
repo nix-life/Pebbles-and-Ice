@@ -1,28 +1,45 @@
+"""
+Date: Janurary 19, 2026
+Author: Charlie Shao and Anson Xiao
+Description:
+
+This program stores all the information and player stats
+to save even after logging out. It uses a text file and 
+a login logic for players to save their progress. It also
+keeps data for all other important things like characters
+and minigames.
+"""
+
 from platform import uname
 import pygame
 import logic 
 
 class Data:
     def __init__(self):
+        """Base data class for shared save/data behaviors."""
         pass
 
 class PlayerStats(Data):
     def __init__(self):
+        """Initialize player stats UI state and unlocks."""
         pygame.init()
         self.boxes = {}
         self.game_controller = logic.GameController()
         self.double_jump_unlocked = False
 
     def unlock_ability(self, level):
+        """Unlock abilities based on completed level."""
         if level >= 2:
             self.double_jump_unlocked = True
         elif level > 3:
             pass
 
     def intelligence_level(self):
+        """Placeholder for intelligence progression."""
         pass
 
     def add_fish(self):
+        """Placeholder for fish collection tracking."""
         pass
     
     def get_text_input(self, screen, prompt):
@@ -123,6 +140,7 @@ class PlayerStats(Data):
             return False
 
     def update_level(self, screen, events):
+        """Show returning player prompt and handle selection."""
         small_font = pygame.font.SysFont("verdana", 48, bold=True)
         title_font = pygame.font.SysFont("Helvetica", 72, bold=True)
         text_surface = title_font.render("Returning Player?", True, (0, 0, 160))
@@ -151,21 +169,12 @@ class PlayerStats(Data):
                     return "new"
 
         return None
-
-class AchivementData(Data):
-    def __init__(self):
-        super().__init__()
-
-    def unlock_achivements(self):
-        pass
-
-    def minigame_record(self):
-        pass
-
 class SaveData(Data):
+    """Persistent save data for a player profile."""
     SAVE_FILE = "savedata.txt"
     
     def __init__(self):
+        """Initialize default save fields for a new profile."""
         self.game_controller = logic.GameController()
         
         # Default save data
@@ -187,6 +196,7 @@ class SaveData(Data):
         self.total_playtime = 0.0
 
     def load_game(self, username):
+        """Load a user's saved data by username."""
         savefile = None
         try:
             savefile = open(self.SAVE_FILE, "r")
@@ -340,46 +350,57 @@ class SaveData(Data):
     
     # Setters for updating save data
     def set_level_reached(self, level):
+        """Update the furthest level reached if higher."""
         if level > self.levels_reached:
             self.levels_reached = level
 
     def complete_level(self, level):
+        """Update highest completed level if higher."""
         if level > self.highest_level_completed:
             self.highest_level_completed = level
 
     def add_fish(self, amount=1):
+        """Increment fish counters for the current session and total."""
         self.fish_collected += amount
         self.total_fish_ever += amount
 
     def unlock_ability(self, ability_name):
+        """Unlock a specific ability by name."""
         if ability_name == "double_jump":
             self.double_jump_unlocked = True
         elif ability_name == "intelligence_boost":
             self.intelligence_boost_unlocked = True
 
     def update_blizzard_time(self, time_survived):
+        """Update best survival time if higher."""
         if time_survived > self.blizzard_survival_best_time:
             self.blizzard_survival_best_time = time_survived
 
     def update_ice_puzzle_attempts(self, attempts):
+        """Update best (lowest) attempt count for ice puzzle."""
         if self.ice_puzzle_best_attempts == 0 or attempts < self.ice_puzzle_best_attempts:
             self.ice_puzzle_best_attempts = attempts
 
     def update_fish_frenzy_score(self, score):
+        """Update fish frenzy high score if higher."""
         if score > self.fish_frenzy_high_score:
             self.fish_frenzy_high_score = score
 
     def update_logic_trial_score(self, score):
+        """Update logic trial high score if higher."""
         if score > self.logic_trial_best_score:
             self.logic_trial_best_score = score
 
     def add_death(self):
+        """Increment total death counter."""
         self.total_deaths += 1
 
     def add_playtime(self, seconds):
+        """Accumulate total playtime in seconds."""
         self.total_playtime += seconds
 
     def unlock_achievement(self, achievement_name):
+        """Add an achievement to the comma-separated list."""
         if achievement_name not in self.achievements:
             if self.achievements == "":
                 self.achievements = achievement_name
@@ -388,15 +409,19 @@ class SaveData(Data):
 
     # Getters for accessing save data
     def get_player_name(self):
+        """Return the player display name."""
         return self.player_name
 
     def get_level_reached(self):
+        """Return the furthest level reached."""
         return self.levels_reached
 
     def get_fish_count(self):
+        """Return fish collected in current profile."""
         return self.fish_collected
 
     def has_ability(self, ability_name):
+        """Check if a named ability is unlocked."""
         if ability_name == "double_jump":
             return self.double_jump_unlocked
         elif ability_name == "intelligence_boost":
@@ -404,6 +429,7 @@ class SaveData(Data):
         return False
 
     def get_minigame_stats(self):
+        """Return a dict of best minigame stats."""
         return {
             "blizzard_survival_best_time": self.blizzard_survival_best_time,
             "ice_puzzle_best_attempts": self.ice_puzzle_best_attempts,
@@ -422,6 +448,7 @@ class SaveData(Data):
 
 class TutorialData(Data):
     def __init__(self):
+        """Initialize tutorial data container."""
         super().__init__()
 
     def load_tutorial(self, screen):
