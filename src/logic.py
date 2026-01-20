@@ -301,19 +301,19 @@ class LevelManager:
         self.current_level = 1
         self.level_complete = False
         
-        # Load all images once
-        self.water_img = pygame.image.load("images/water.png")
+        # Load all images once (use convert() for faster blitting)
+        self.water_img = pygame.image.load("images/water.png").convert_alpha()
         self.water_img = pygame.transform.smoothscale(self.water_img, (50, 50))
         
-        self.big_platform_img = pygame.image.load("images/big-platform.png")
+        self.big_platform_img = pygame.image.load("images/big-platform.png").convert_alpha()
         self.big_platform_img = pygame.transform.scale(self.big_platform_img, (350, 100))
         
-        self.small_platform_img = pygame.image.load("images/small-platform.png")
+        self.small_platform_img = pygame.image.load("images/small-platform.png").convert_alpha()
         self.small_platform_img = pygame.transform.scale(self.small_platform_img, (150, 50))
         
-        self.ice_platform_img = pygame.image.load("images/big-ice-platform.png")
+        self.ice_platform_img = pygame.image.load("images/big-ice-platform.png").convert_alpha()
         
-        self.portal_img = pygame.image.load("images/portal.png")
+        self.portal_img = pygame.image.load("images/portal.png").convert_alpha()
         self.portal_img = pygame.transform.smoothscale(self.portal_img, (80, 100))
         
         # Evil tux enemy

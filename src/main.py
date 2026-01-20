@@ -23,10 +23,17 @@ class GameLevel:
     """
     def __init__(self, save_data=None, start_level=1):
         """Initialize pygame, core systems, and start the main loop."""
-        pygame.init()
+        # Don't call pygame.init() - it's already initialized by Environment
         # Fixed window size for all levels
         self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Pebbles and Ice")
+        
+        # Show loading screen immediately
+        self.screen.fill((20, 20, 40))
+        font = pygame.font.Font(None, 72)
+        loading_text = font.render("Loading...", True, (255, 255, 255))
+        self.screen.blit(loading_text, (500 - loading_text.get_width() // 2, 280))
+        pygame.display.flip()
 
         # Core systems and shared game objects
         self.player = Player(120, self.screen.get_height() - 200)
@@ -37,8 +44,8 @@ class GameLevel:
             self.save_data = save_data 
         else:
             self.save_data = SaveData()
-        # Background texture shared by all levels
-        self.game_bg = pygame.image.load("images/game-background.png")
+        # Background texture shared by all levels (use convert for faster blitting)
+        self.game_bg = pygame.image.load("images/game-background.png").convert()
         self.game_bg = pygame.transform.smoothscale(self.game_bg, (1000, 600))
         self.clock = pygame.time.Clock()
         

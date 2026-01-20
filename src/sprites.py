@@ -360,11 +360,10 @@ class Environment(Sprites):
                 from main import GameLevel
                 GameLevel(save_data=self.load_data, start_level=self.game_control.level)
                 
-                # After returning from GameLevel (after minigame), reinitialize pygame and screen
-                pygame.init()
+                # After returning from GameLevel (after minigame), reinitialize screen
                 self.screen = pygame.display.set_mode((1000, 600))
                 pygame.display.set_caption("Pebbles and Ice")
-                self.game_bg = pygame.image.load("images/game-background.png")
+                self.game_bg = pygame.image.load("images/game-background.png").convert()
                 self.game_bg = pygame.transform.smoothscale(self.game_bg, (1000, 600))
                 # Continue loop to show level selection again
                 
