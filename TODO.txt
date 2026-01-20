@@ -1,7 +1,7 @@
 1. Levels
 	- Design and implement all 5 levels with unique layouts, hazards, and platform types (ice, snow, water, etc.).
 	- Integrate minigame triggers and NPCs into levels.
-    - Missing 2, 3, 4, 5
+    - Missing 5
 
 3. NPCs and Dialogue
 	- Implement NPCs in levels with interactive dialogue (from chat.txt).
