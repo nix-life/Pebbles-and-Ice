@@ -603,8 +603,7 @@ class BlizzardSurvival(Minigame):
         # Instructions at bottom
         if self.game_time < 180:  # Show for first 3 seconds
             alpha = max(0, 255 - (self.game_time - 120) * 4) if self.game_time > 120 else 255
-            inst_text = self.font_small.render("Use LEFT/RIGHT arrows to dodge!" \
-            "Minimum of 20 seconds.", True, (255, 255, 255))
+            inst_text = self.font_small.render("Use LEFT/RIGHT arrows to dodge! Minimum of 15 seconds.", True, (255, 255, 255))
             inst_text.set_alpha(alpha)
             self.screen.blit(inst_text, (500 - inst_text.get_width() / 2, 560))
 
@@ -634,19 +633,12 @@ class BlizzardSurvival(Minigame):
             
             # Check if minimum requirement met (20 seconds)
             time_survived = self.game_time / 60
-            if time_survived >= 20:
+            if time_survived >= 15:
                 continue_text = self.font_small.render("Press SPACE to continue", True, (100, 255, 100))
             else:
-                continue_text = self.font_small.render("Minimum 20 seconds required - Press R to restart", True, (255, 100, 100))
+                continue_text = self.font_small.render("Minimum 15 seconds required - Press R to restart", True, (255, 100, 100))
             self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 480))
-            
-            # Check if minimum requirement met (20 seconds)
-            time_survived = self.game_time / 60
-            if time_survived >= 20:
-                continue_text = self.font_small.render("Press SPACE to continue", True, (100, 255, 100))
-            else:
-                continue_text = self.font_small.render("Minimum 20 seconds required - Press R to restart", True, (255, 100, 100))
-            self.screen.blit(continue_text, (500 - continue_text.get_width() / 2, 480))
+        
 
     def loop(self):
         clock = pygame.time.Clock()
@@ -1184,3 +1176,5 @@ class LogicTrial(Minigame):
                 self.draw_question()
             
             pygame.display.flip()
+
+BlizzardSurvival()

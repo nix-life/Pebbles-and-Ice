@@ -45,7 +45,7 @@ class GameController:
                 # Draw locked level in gray
                 pygame.draw.rect(screen, (100, 100, 100), box_rect, border_radius=10)
                 # Draw lock icon
-                lock_text = lock_font.render("🔒", True, (50, 50, 50))
+                lock_text = lock_font.render("", True, (50, 50, 50))
                 lock_rect = lock_text.get_rect(center=(x + 62, y + 62))
                 screen.blit(lock_text, lock_rect)
             else:
@@ -297,17 +297,15 @@ class LevelManager:
         self.portal_img = pygame.transform.smoothscale(self.portal_img, (80, 100))
         
         # Evil tux enemy
-        self.evil_tux_img = pygame.image.load("images/tux-left.png")
+        self.evil_tux_img = pygame.image.load("images/evil-penguin.png").convert_alpha()
         self.evil_tux_img = pygame.transform.smoothscale(self.evil_tux_img, (40, 60))
-        # Tint it red to make it evil looking
-        self.evil_tux_img.fill((255, 100, 100), special_flags=pygame.BLEND_MULT)
         
         # Level 3 enemy state
         self.evil_tux_x = 0
         self.evil_tux_y = 0
         self.evil_tux_speed = 100
-        self.evil_tux_direction = 1  # 1 = right, -1 = left
-        self.evil_tux_platform = None  # Platform the enemy is on
+        self.evil_tux_direction = 1  
+        self.evil_tux_platform = None 
         
         # Death animation state
         self.death_timer = 0
