@@ -352,3 +352,17 @@ achievements =
 total_deaths = 0
 total_playtime = 0.00
 
+[USER:legoat]
+username = legoat
+password = lebron
+player_name = 
+levels_reached = 3
+highest_level_completed = 2
+blizzard_survival_best_time = 0.00
+ice_puzzle_best_attempts = 1
+fish_frenzy_high_score = 16
+logic_trial_best_score = 0
+achievements = 
+total_deaths = 9
+total_playtime = 116.84
+

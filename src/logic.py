@@ -692,8 +692,8 @@ class LevelManager:
                 self.death_timer = 30  # Half second death animation
                 self.death_sound.play()  # Play death sound
             
-            # Check portal collision (level complete) - must talk to owl first
-            if player.rect.colliderect(portal_rect) and self.talked_to_owl:
+            # Check portal collision (level complete)
+            if player.rect.colliderect(portal_rect):
                 self.level_complete = True
                 self.fish_initialized = False  # Reset fish for next level
                 self.talked_to_owl = False  # Reset for replay
@@ -926,8 +926,8 @@ class LevelManager:
                 self.death_timer = 30
                 self.death_sound.play()  # Play death sound
             
-            # Check portal collision (level complete) - must talk to fox first
-            if player.rect.colliderect(portal_rect) and self.talked_to_fox:
+            # Check portal collision (level complete)
+            if player.rect.colliderect(portal_rect):
                 self.level_complete = True
                 # Reset enemy for next time
                 self.evil_tux_platform = None
@@ -1172,7 +1172,7 @@ class LevelManager:
                 self.death_timer = 30
                 self.death_sound.play()  # Play death sound
             
-            if player.rect.colliderect(portal_rect) and self.talked_to_bear:
+            if player.rect.colliderect(portal_rect):
                 self.level_complete = True
                 # Reset enemy for next time
                 self.evil_tux_platform = None
@@ -1411,7 +1411,7 @@ class LevelManager:
                     self.death_sound.play()  # Play death sound
                     break
             
-            if player.rect.colliderect(portal_rect) and self.talked_to_rabbit:
+            if player.rect.colliderect(portal_rect):
                 self.level_complete = True
                 self.level5_enemies_initialized = False
                 self.talked_to_rabbit = False  # Reset for replay

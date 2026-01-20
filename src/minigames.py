@@ -843,7 +843,7 @@ class FishFrenzy(Minigame):
         # List to store falling fish
         self.falling_fish = []
         self.spawn_timer = 0
-        self.spawn_delay = random.randint(10, 60) # frames - faster spawn rate
+        self.spawn_delay = random.randint(120, 180) # frames - spawn every 2-3 seconds
         
         # Score counter
         self.score = 0
