@@ -37,7 +37,7 @@ class Minigame:
 
 class IcePuzzle(Minigame):
     """Tile-based memory puzzle: find the safe ice path."""
-    def __init__(self, screen=None):
+    def __init__(self, screen=None, save_data=None):
         """Initialize the ice puzzle grid, state, and loop."""
         super().__init__()
 
@@ -452,7 +452,7 @@ class IcePuzzle(Minigame):
 
 class BlizzardSurvival(Minigame):
     """Dodge falling snowballs for a time-based score."""
-    def __init__(self, screen=None):
+    def __init__(self, screen=None, save_data=None):
         """Initialize blizzard survival assets, state, and loop."""
         super().__init__()
         self.save_data = save_data
@@ -824,9 +824,10 @@ class BlizzardSurvival(Minigame):
 
 class FishFrenzy(Minigame):
     """Click falling fish before any escape."""
-    def __init__(self, screen=None):
+    def __init__(self, screen=None, save_data=None):
         """Initialize fish frenzy assets, state, and loop."""
         super().__init__()
+        self.save_data = save_data
 
         pygame.init()
         if screen is not None:
@@ -1014,8 +1015,9 @@ class FishFrenzy(Minigame):
 
 class LogicTrial(Minigame):
     """Multiple-choice quiz minigame with pass/fail logic."""
-    def __init__(self, screen=None):
+    def __init__(self, screen=None, save_data=None):
         """Initialize quiz questions, visuals, and loop."""
+        self.save_data = save_data
         pygame.init()
         if screen is not None:
             self.screen = screen
