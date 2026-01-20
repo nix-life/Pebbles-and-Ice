@@ -428,7 +428,6 @@ class LevelManager:
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
         right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
-        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
 
         water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
 
@@ -463,7 +462,7 @@ class LevelManager:
         if not self.is_dying:
             physics.apply_gravity(player, dt)
             player.update(dt)
-            physics.handle_collisions(player, platform_rects + [left_wall, right_wall, ceiling], ice_platform_rects)
+            physics.handle_collisions(player, platform_rects + [left_wall, right_wall], ice_platform_rects)
             physics.apply_friction(player, dt)
             
             # Check water collision (death)
@@ -574,7 +573,6 @@ class LevelManager:
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
         right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
-        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
 
         water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
 
@@ -609,7 +607,7 @@ class LevelManager:
         if not self.is_dying:
             physics.apply_gravity(player, dt)
             player.update(dt)
-            physics.handle_collisions(player, platform_rects + [left_wall, right_wall, ceiling], ice_platform_rects)
+            physics.handle_collisions(player, platform_rects + [left_wall, right_wall], ice_platform_rects)
             physics.apply_friction(player, dt)
             
             # Check water collision (death)
@@ -734,7 +732,6 @@ class LevelManager:
         # Add invisible walls around the screen
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
         right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
-        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
 
         water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
 
@@ -797,7 +794,7 @@ class LevelManager:
         if not self.is_dying:
             physics.apply_gravity(player, dt)
             player.update(dt)
-            physics.handle_collisions(player, platform_rects + [left_wall, right_wall, ceiling], ice_platform_rects)
+            physics.handle_collisions(player, platform_rects + [left_wall, right_wall], ice_platform_rects)
             physics.apply_friction(player, dt)
             
             # Check water collision (death)
@@ -928,9 +925,8 @@ class LevelManager:
         # Invisible walls
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
         right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
-        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
         
-        all_collision_rects = platform_rects + [left_wall, right_wall, ceiling]
+        all_collision_rects = platform_rects + [left_wall, right_wall]
 
         water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
 
@@ -1137,9 +1133,8 @@ class LevelManager:
         # Invisible walls
         left_wall = pygame.Rect(-10, 0, 10, screen.get_height())
         right_wall = pygame.Rect(screen.get_width(), 0, 10, screen.get_height())
-        ceiling = pygame.Rect(0, -10, screen.get_width(), 10)
         
-        all_collision_rects = platform_rects + [left_wall, right_wall, ceiling]
+        all_collision_rects = platform_rects + [left_wall, right_wall]
 
         water_hitbox = pygame.Rect(0, screen.get_height() - water_img.get_height() + 20, screen.get_width(), water_img.get_height())
 
