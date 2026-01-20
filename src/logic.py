@@ -169,10 +169,11 @@ class GameController:
             "Total Deaths: %d" % save_data.total_deaths,
             "Playtime: %.1f minutes" % (save_data.total_playtime / 60),
             "",
-            "Minigame Records:",
-            "  Logic Trial: %d" % save_data.logic_trial_best_score,
-            "  Blizzard Survival: %.1fs" % save_data.blizzard_survival_best_time,
-            "  Fish Frenzy: %d" % save_data.fish_frenzy_high_score,
+            "Minigame Best Scores:",
+            "  Ice Puzzle: %d attempts" % (save_data.ice_puzzle_best_attempts if save_data.ice_puzzle_best_attempts > 0 else 0),
+            "  Logic Trial: %d correct" % save_data.logic_trial_best_score,
+            "  Fish Frenzy: %d fish" % save_data.fish_frenzy_high_score,
+            "  Blizzard Survival: %.1f seconds" % save_data.blizzard_survival_best_time,
         ]
         
         for line in stats_lines:

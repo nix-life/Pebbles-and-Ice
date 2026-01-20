@@ -477,7 +477,8 @@ class TutorialData(Data):
                 "STORY:",
                 "You are a penguin named Tux.",
                 "Your goal is to bring a pebble to your friend Domino.",
-                "Becarewful of the icy terrain and obstacles along the way!",
+                "Be careful of the icy terrain and obstacles along the way!",
+                "If you lose all 3 lives in a level, you will have to restart it by playing the minigame.",
                 "If a level has a NPC, you will need to interact with them to proceed.",
                 "",
                 "Press any key or click to continue..."

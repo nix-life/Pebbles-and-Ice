@@ -47,6 +47,7 @@ class IcePuzzle(Minigame):
         else:
             self.screen = pygame.display.set_mode((1000, 600))
         pygame.display.set_caption("Ice Puzzle - Find the Path!")
+        self.save_data = save_data
         
         # Grid settings
         self.grid_cols = 20
@@ -394,6 +395,9 @@ class IcePuzzle(Minigame):
                                     if not self.win_sound_played:
                                         self.win_sound.play()  # Play win sound
                                         self.win_sound_played = True
+                                    # Update save data with attempts
+                                    if self.save_data:
+                                        self.save_data.update_ice_puzzle_attempts(self.attempts + 1)
                             else:
                                 # Fell through!
                                 self.player_pos = clicked_tile
@@ -451,6 +455,7 @@ class BlizzardSurvival(Minigame):
     def __init__(self, screen=None):
         """Initialize blizzard survival assets, state, and loop."""
         super().__init__()
+        self.save_data = save_data
 
         pygame.init()
         if screen is not None:
@@ -642,7 +647,10 @@ class BlizzardSurvival(Minigame):
         
         # Instructions at bottom
         if self.game_time < 180:  # Show for first 3 seconds
-            alpha = max(0, 255 - (self.game_time - 120) * 4) if self.game_time > 120 else 255
+            if self.game_time > 120:
+                alpha = max(0, 255 - (self.game_time - 120) * 4)
+            else:
+                alpha = 255
             inst_text = self.font_small.render("Use LEFT/RIGHT arrows to dodge! Minimum of 15 seconds.", True, (255, 255, 255))
             inst_text.set_alpha(alpha)
             self.screen.blit(inst_text, (500 - inst_text.get_width() / 2, 560))
@@ -745,6 +753,10 @@ class BlizzardSurvival(Minigame):
                     self.game_over = True
                     self.screen_shake = 10
                     self.death_sound.play()  # Play death sound
+                    # Update save data with survival time
+                    if self.save_data:
+                        time_survived = self.game_time / 60
+                        self.save_data.update_blizzard_time(time_survived)
             else:
                 # Let the game-over overlay fade in
                 self.game_over_timer += 1
@@ -874,6 +886,9 @@ class FishFrenzy(Minigame):
                 # Fish escaped - game over
                 self.game_complete = True
                 self.death_sound.play()  # Play death sound
+                # Update save data with score
+                if self.save_data:
+                    self.save_data.update_fish_frenzy_score(self.score)
 
     def draw_fish(self):
         """Draw all falling fish"""
@@ -1239,6 +1254,9 @@ class LogicTrial(Minigame):
                     self.current_question += 1
                     if self.current_question >= len(self.questions):
                         self.game_state = "finished"
+                        # Update save data with score
+                        if self.save_data:
+                            self.save_data.update_logic_trial_score(self.score)
                     else:
                         self.game_state = "playing"
             
